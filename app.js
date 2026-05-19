@@ -290,11 +290,18 @@ const APP = {
   currentRoutineExercises: [],
   currentTimerSession: 'am',  // which session is being timed
   settings: {
-    name: 'Luis',
+    name: 'El usuario',
     goal: 'Funcional + agua + físico playa',
     mode: 'normal',
     dailyMinTarget: 35,
     dailySeriesTarget: 25
+  },
+  // ── CORE v3 ──────────────────────────────────────────────────
+  core: {
+    intention: '',            // "calma" | "presencia" | "claridad" | "paciencia" | "foco" | custom
+    checkIn: null,            // {energia:1|2|3, ansiedad:1|2|3, claridad:1|2|3, date:''}
+    journalToday: null,       // {date:'', q1:'', q2:'', q3:'', saved:false}
+    guard: false              // anti-overload guard active
   }
 };
 
@@ -383,82 +390,77 @@ function createSchema() {
       meal_type TEXT,
       completed INTEGER DEFAULT 0
     );
+    CREATE TABLE IF NOT EXISTS morning_intentions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      date TEXT NOT NULL,
+      intention TEXT,
+      created_at TEXT DEFAULT (datetime('now','localtime'))
+    );
+    CREATE TABLE IF NOT EXISTS check_ins (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      date TEXT NOT NULL,
+      energia INTEGER DEFAULT 0,
+      ansiedad INTEGER DEFAULT 0,
+      claridad INTEGER DEFAULT 0,
+      sueno_horas REAL DEFAULT 0,
+      created_at TEXT DEFAULT (datetime('now','localtime'))
+    );
+    CREATE TABLE IF NOT EXISTS journal_entries (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      date TEXT NOT NULL,
+      q1 TEXT DEFAULT '',
+      q2 TEXT DEFAULT '',
+      q3 TEXT DEFAULT '',
+      created_at TEXT DEFAULT (datetime('now','localtime'))
+    );
   `);
   saveDB();
 }
 
-function normalizeSession(s) {
-  return {
-    ...s,
-    session_type:         s.session_type         ?? s.type        ?? '',
-    duration_min:         s.duration_min         ?? s.duration    ?? 0,
-    series_completed:     s.series_completed     ?? s.series      ?? 0,
-    exercises_completed:  s.exercises_completed  ?? s.exDone      ?? 0,
-    exercises_total:      s.exercises_total      ?? s.exTotal     ?? 0,
-    routine_name:         s.routine_name         || s.routineName || ''
-  };
-}
-
 const DB = {
   saveSession(s) {
-    // Always update APP.sessions AND persist to localStorage so the
-    // fallback chain works even after a full page reload.
-    APP.sessions = APP.sessions.filter(x => !(x.date === s.date && (x.type === s.type || x.session_type === s.type)));
-    APP.sessions.push({...s, session_type: s.type});
-    saveToStorage();
-
     if (APP.db) {
-      try {
-        APP.db.run(
-          `INSERT INTO sessions (date,session_type,routine_name,duration_min,
-            exercises_completed,exercises_total,series_completed,energy,score,notes)
-           VALUES (?,?,?,?,?,?,?,?,?,?)`,
-          [s.date, s.type, s.routineName, s.duration||0,
-           s.exDone||0, s.exTotal||0, s.series||0, s.energy||3, s.score||0, s.notes||'']
-        );
-        const rows = APP.db.exec('SELECT last_insert_rowid()');
-        const id = rows[0]?.values[0][0];
-        saveDB();
-        return id;
-      } catch(e) {
-        console.warn('[DB.saveSession] SQLite error:', e);
-      }
+      APP.db.run(
+        `INSERT INTO sessions (date,session_type,routine_name,duration_min,
+          exercises_completed,exercises_total,series_completed,energy,score,notes)
+         VALUES (?,?,?,?,?,?,?,?,?,?)`,
+        [s.date, s.type, s.routineName, s.duration||0,
+         s.exDone||0, s.exTotal||0, s.series||0, s.energy||3, s.score||0, s.notes||'']
+      );
+      const rows = APP.db.exec('SELECT last_insert_rowid()');
+      const id = rows[0]?.values[0][0];
+      saveDB();
+      return id;
     }
-    return 'ls_' + Date.now();
+    const session = {...s, id: 'ls_'+Date.now()};
+    APP.sessions = APP.sessions.filter(x => !(x.date === s.date && x.type === s.type));
+    APP.sessions.push(session);
+    saveToStorage();
+    return session.id;
   },
 
   getSessionsForDate(date) {
     if (APP.db) {
-      try {
-        const rows = APP.db.exec(
-          `SELECT * FROM sessions WHERE date=? ORDER BY created_at DESC`, [date]
-        );
-        if (rows[0] && rows[0].values.length > 0) {
-          const cols = rows[0].columns;
-          return rows[0].values.map(r => Object.fromEntries(cols.map((c,i) => [c,r[i]])));
-        }
-      } catch(e) {
-        console.warn('[DB.getSessionsForDate] SQLite error:', e);
-      }
+      const rows = APP.db.exec(
+        `SELECT * FROM sessions WHERE date=? ORDER BY created_at DESC`, [date]
+      );
+      if (!rows[0]) return [];
+      const cols = rows[0].columns;
+      return rows[0].values.map(r => Object.fromEntries(cols.map((c,i) => [c,r[i]])));
     }
-    return APP.sessions.filter(s => s.date === date).map(normalizeSession);
+    return APP.sessions.filter(s => s.date === date);
   },
 
   getRecentSessions(n = 14) {
     if (APP.db) {
-      try {
-        const rows = APP.db.exec(
-          `SELECT * FROM sessions ORDER BY date DESC, created_at DESC`
-        );
-        if (rows[0] && rows[0].values.length > 0) {
-          const cols = rows[0].columns;
-          return rows[0].values.map(r => Object.fromEntries(cols.map((c,i) => [c,r[i]]))).slice(0, n);
-        }
-      } catch(e) {
-        console.warn('[DB.getRecentSessions] SQLite error:', e);
-      }
+      const rows = APP.db.exec(
+        `SELECT * FROM sessions ORDER BY date DESC, created_at DESC LIMIT ?`, [n]
+      );
+      if (!rows[0]) return [];
+      const cols = rows[0].columns;
+      return rows[0].values.map(r => Object.fromEntries(cols.map((c,i) => [c,r[i]])));
     }
-    return [...APP.sessions].sort((a,b) => b.date.localeCompare(a.date)).slice(0, n).map(normalizeSession);
+    return [...APP.sessions].sort((a,b) => b.date.localeCompare(a.date)).slice(0, n);
   },
 
   saveWeight(exId, kg) {
@@ -526,30 +528,94 @@ const DB = {
 
   getMealLogsForDate(date) {
     if (APP.db) {
-      try {
-        const rows = APP.db.exec(
-          `SELECT meal_type, completed FROM meal_logs WHERE date=?`, [date]
-        );
-        const result = {};
-        if (rows[0]) rows[0].values.forEach(([t, c]) => { result[t] = !!c; });
-        return result;
-      } catch(e) {
-        console.warn('[DB.getMealLogsForDate] SQLite error:', e);
-      }
+      const rows = APP.db.exec(
+        `SELECT meal_type, completed FROM meal_logs WHERE date=?`, [date]
+      );
+      const result = {};
+      if (rows[0]) rows[0].values.forEach(([t, c]) => { result[t] = !!c; });
+      return result;
     }
     return APP.mealCompleted;
   },
 
-  getStreakDates() {
+  // ── CORE v3 methods ─────────────────────────────────────────
+  saveIntention(date, intention) {
     if (APP.db) {
-      try {
-        const rows = APP.db.exec(
-          `SELECT DISTINCT date FROM sessions WHERE score > 0 ORDER BY date DESC LIMIT 30`
-        );
-        if (rows[0] && rows[0].values.length > 0) return rows[0].values.map(r => r[0]);
-      } catch(e) {
-        console.warn('[DB.getStreakDates] SQLite error:', e);
+      APP.db.run(`INSERT OR REPLACE INTO morning_intentions (date, intention) VALUES (?,?)`,
+        [date, intention]);
+      saveDB();
+    }
+  },
+  getTodayIntention(date) {
+    if (!APP.db) return '';
+    try {
+      const r = APP.db.exec(`SELECT intention FROM morning_intentions WHERE date=? ORDER BY id DESC LIMIT 1`, [date]);
+      return r[0]?.values[0]?.[0] || '';
+    } catch(e){ return ''; }
+  },
+  saveCheckIn(date, energia, ansiedad, claridad, sueno) {
+    if (APP.db) {
+      APP.db.run(`INSERT OR REPLACE INTO check_ins (date,energia,ansiedad,claridad,sueno_horas) VALUES (?,?,?,?,?)`,
+        [date, energia, ansiedad, claridad, sueno||0]);
+      saveDB();
+    }
+  },
+  getTodayCheckIn(date) {
+    if (!APP.db) return null;
+    try {
+      const r = APP.db.exec(`SELECT energia,ansiedad,claridad,sueno_horas FROM check_ins WHERE date=? ORDER BY id DESC LIMIT 1`,[date]);
+      if (!r[0]) return null;
+      const [energia,ansiedad,claridad,sueno] = r[0].values[0];
+      return {energia,ansiedad,claridad,sueno,date};
+    } catch(e){ return null; }
+  },
+  getRecentCheckIns(n) {
+    if (!APP.db) return [];
+    try {
+      const r = APP.db.exec(`SELECT date,energia,ansiedad,claridad,sueno_horas FROM check_ins ORDER BY date DESC LIMIT ?`,[n]);
+      if (!r[0]) return [];
+      return r[0].values.map(v => ({date:v[0],energia:v[1],ansiedad:v[2],claridad:v[3],sueno:v[4]}));
+    } catch(e){ return []; }
+  },
+  saveJournalEntry(date, q1, q2, q3) {
+    if (APP.db) {
+      APP.db.run(`INSERT OR REPLACE INTO journal_entries (date,q1,q2,q3) VALUES (?,?,?,?)`,
+        [date, q1||'', q2||'', q3||'']);
+      saveDB();
+    }
+  },
+  getTodayJournal(date) {
+    if (!APP.db) return null;
+    try {
+      const r = APP.db.exec(`SELECT q1,q2,q3 FROM journal_entries WHERE date=? ORDER BY id DESC LIMIT 1`,[date]);
+      if (!r[0]) return null;
+      const [q1,q2,q3] = r[0].values[0];
+      return {date,q1:q1||'',q2:q2||'',q3:q3||''};
+    } catch(e){ return null; }
+  },
+  getJournalStreak() {
+    if (!APP.db) return 0;
+    try {
+      const r = APP.db.exec(`SELECT DISTINCT date FROM journal_entries ORDER BY date DESC LIMIT 30`);
+      if (!r[0]) return 0;
+      const dates = r[0].values.map(v=>v[0]);
+      let streak = 0;
+      const today = getTodayKey();
+      for (let i=0; i<dates.length; i++) {
+        const expected = localDateKey(new Date(Date.now() - i*86400000));
+        if (dates[i] === expected) streak++;
+        else break;
       }
+      return streak;
+    } catch(e){ return 0; }
+  },
+    getStreakDates() {
+    if (APP.db) {
+      const rows = APP.db.exec(
+        `SELECT DISTINCT date FROM sessions WHERE score > 0 ORDER BY date DESC LIMIT 30`
+      );
+      if (!rows[0]) return [];
+      return rows[0].values.map(r => r[0]);
     }
     return [...new Set(APP.sessions.filter(s => s.score > 0).map(s => s.date))].sort().reverse();
   }
@@ -565,6 +631,7 @@ function saveToStorage() {
     localStorage.setItem('af_weights_v2',    JSON.stringify(APP.exerciseWeights));
     localStorage.setItem('af_measures_v2',   JSON.stringify(APP.bodyMeasures));
     localStorage.setItem('af_meal_log',      JSON.stringify(APP.mealCompleted));
+    localStorage.setItem('af_core_v3',       JSON.stringify(APP.core));
     localStorage.setItem('af_completed_v2',  JSON.stringify({
       date: getTodayKey(),
       am:   Array.from(APP.completedExercises.am),
@@ -588,6 +655,8 @@ function loadFromStorage() {
     if (measures) APP.bodyMeasures = JSON.parse(measures);
 
     const mealLog = localStorage.getItem('af_meal_log');
+    const coreRaw = localStorage.getItem('af_core_v3');
+    if (coreRaw) { try { Object.assign(APP.core, JSON.parse(coreRaw)); } catch(e){} }
     if (mealLog) APP.mealCompleted = JSON.parse(mealLog);
 
     const completed = localStorage.getItem('af_completed_v2');
@@ -793,6 +862,7 @@ function navigateTo(page) {
   if (page === 'dashboard') renderDashboard();
   if (page === 'exercises') renderExerciseLibrary();
   if (page === 'settings')  renderSettings();
+  if (page === 'night')     renderNight();
 }
 
 function switchTab(tab) {
@@ -868,6 +938,9 @@ function renderHome() {
   const tom = tomorrow?.am || tomorrow?.pm;
   document.getElementById('tomorrow-name').textContent = `${tomorrow?.label} — ${tom?.name || 'Descanso'}`;
   document.getElementById('tomorrow-note').textContent = tomorrow?.am?.focus || '';
+
+  // ── CORE v3: intention + state bar + guard + hombre4 ─────────
+  renderCoreHomeElements();
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -1192,13 +1265,7 @@ function completeSession(type) {
     energy:      sessionData.energy
   });
 
-  try {
-    DB.saveSession(sessionData);
-  } catch(e) {
-    console.error('[completeSession] Error al guardar:', e);
-    showToast('⚠️ Error al guardar la sesión. Intenta de nuevo.', 'error');
-    return;
-  }
+  DB.saveSession(sessionData);
   showToast(`✅ Sesión ${type.toUpperCase()} guardada · Score: ${sessionData.score}`, 'success');
   navigateTo('dashboard');
 }
@@ -1473,10 +1540,9 @@ function renderDashboard() {
     const pmSess = todaySessions.find(s => s.session_type === 'PM');
     const bestSess = todaySessions.reduce((b, s) => (s.score||0) > (b?.score||0) ? s : b, null);
     const score = bestSess?.score || 0;
-    let streak = 0, weekStats = {completed:0,minutes:0,total:0}, weekScore = {avg:0,best:0,count:0};
-    try { streak = getStreak(); } catch(e) { console.warn('[dash] getStreak:', e); }
-    try { weekStats = getWeekStats(); } catch(e) { console.warn('[dash] getWeekStats:', e); }
-    try { weekScore = getWeeklyScore(); } catch(e) { console.warn('[dash] getWeeklyScore:', e); }
+    const streak = getStreak();
+    const weekStats = getWeekStats();
+    const weekScore = getWeeklyScore();
     const sched = getTodaySchedule();
     const amExs = getModifiedExercises(sched?.am?.exercises || [], APP.currentMode);
     const pmExs = getModifiedExercises(sched?.pm?.exercises || [], APP.currentMode);
@@ -1485,7 +1551,7 @@ function renderDashboard() {
     const CIRC = 578;
     const fill = document.getElementById('main-score-fill');
     if (fill) {
-      fill.setAttribute('class', `fill ${getScoreColor(score)}`);
+      fill.className = `fill ${getScoreColor(score)}`;
       fill.style.transition = 'none'; fill.style.strokeDashoffset = CIRC;
       requestAnimationFrame(() => {
         fill.style.transition = 'stroke-dashoffset 1.4s cubic-bezier(.22,.61,.36,1)';
@@ -1882,10 +1948,50 @@ function bindEvents() {
       APP.sessions = []; APP.bodyMeasures = [];
       APP.completedExercises = {am:new Set(), pm:new Set()};
       APP.mealCompleted = {};
+      APP.core = {intention:'',checkIn:null,journalToday:null,guard:false};
       localStorage.clear(); showToast('Datos borrados', 'error');
       renderHome();
     }
   });
+
+  // ── CORE v3 events ────────────────────────────────────────────
+  // Night nav button
+  document.getElementById('btn-nav-night')?.addEventListener('click', () => navigateTo('night'));
+
+  // Intention chips
+  document.addEventListener('click', e => {
+    const chip = e.target.closest('.int-chip');
+    if (!chip) return;
+    const val = chip.dataset.int;
+    if (!val) return;
+    APP.core.intention = val;
+    DB.saveIntention(getTodayKey(), val);
+    document.querySelectorAll('.int-chip').forEach(c => c.classList.remove('selected'));
+    chip.classList.add('selected');
+    saveToStorage();
+    showToast('Intención: ' + val);
+  });
+
+  // Check-in dots
+  document.addEventListener('click', e => {
+    const dot = e.target.closest('.ck-dot[data-ci]');
+    if (!dot) return;
+    const [metric, val] = dot.dataset.ci.split(':');
+    if (!APP.core.checkIn) APP.core.checkIn = {energia:0,ansiedad:0,claridad:0,date:getTodayKey()};
+    APP.core.checkIn[metric] = parseInt(val);
+    APP.core.checkIn.date = getTodayKey();
+    DB.saveCheckIn(getTodayKey(), APP.core.checkIn.energia||0, APP.core.checkIn.ansiedad||0,
+      APP.core.checkIn.claridad||0, 0);
+    saveToStorage();
+    renderCheckInDots();
+    renderStateBarScores();
+  });
+
+  // Journal save
+  document.getElementById('btn-save-journal')?.addEventListener('click', saveJournalEntry);
+
+  // Night page nav back
+  document.getElementById('btn-night-back')?.addEventListener('click', () => navigateTo('home'));
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -1907,12 +2013,267 @@ async function init() {
   Object.assign(APP.mealCompleted, mealLogs);
 
   APP.currentDayOfWeek = new Date().getDay();
+
+  // ── CORE v3: load today's data ───────────────────────────────
+  const todayKey = getTodayKey();
+  const savedIntention = DB.getTodayIntention(todayKey);
+  if (savedIntention) APP.core.intention = savedIntention;
+  const savedCheckIn = DB.getTodayCheckIn(todayKey);
+  if (savedCheckIn) APP.core.checkIn = savedCheckIn;
+  const savedJournal = DB.getTodayJournal(todayKey);
+  if (savedJournal) APP.core.journalToday = savedJournal;
+  APP.core.guard = checkOverloadGuard();
+
   bindEvents();
   navigateTo('home');
 
-  console.log('🌊 AquaForce v2 ready');
+  console.log('🌊 AquaForce v3 Core ready');
   console.log(`📅 ${new Date().toLocaleDateString('es-PE')} · Día ${APP.currentDayOfWeek}`);
   console.log(`🗄️ SQLite: ${APP.dbReady ? '✅' : '⚠️ localStorage fallback'}`);
 }
 
 document.addEventListener('DOMContentLoaded', init);
+
+// ════════════════════════════════════════════════════════════════
+// 20. CORE v3 — Intención · Check-in · Journaling · Guardia
+// ════════════════════════════════════════════════════════════════
+
+const INTENTIONS = ['Calma','Presencia','Claridad','Paciencia','Foco','Conciencia','Apertura'];
+
+const HOMBRE4_PROMPTS = [
+  '¿Estás reaccionando o respondiendo?',
+  '¿Actúas desde presencia o desde hábito?',
+  '¿Tu energía viene de propósito o de ansiedad?',
+  '¿Qué automatismo observaste hoy?',
+  '¿En qué momento estuviste realmente presente?',
+  '¿Qué parte de ti necesitaba ser vista hoy?',
+  '¿Cuándo dejaste de observar y empezaste a actuar automáticamente?'
+];
+
+function getHombre4Prompt() {
+  const idx = new Date().getDay();
+  return HOMBRE4_PROMPTS[idx];
+}
+
+// ── Overload guard ────────────────────────────────────────────
+function checkOverloadGuard() {
+  const recent = DB.getRecentCheckIns(3);
+  if (recent.length < 2) return false;
+  const highAnsiedad = recent.filter(c => c.ansiedad === 3).length;
+  const lowSueno    = recent.filter(c => c.sueno > 0 && c.sueno < 5.5).length;
+  const jStreak     = DB.getJournalStreak();
+  if (highAnsiedad >= 2) return true;
+  if (lowSueno >= 2) return true;
+  return false;
+}
+
+// ── Internal score (4 dimensions) ────────────────────────────
+function getInternalScore() {
+  const todaySess = getTodaySessionsData();
+  const fisico = todaySess.length > 0 ? Math.max(...todaySess.map(s=>s.score||0)) : 0;
+  const ci = APP.core.checkIn;
+  const sueno    = ci?.sueno > 0 ? Math.round(Math.min(ci.sueno / 8 * 100, 100)) : 0;
+  const presencia = ci ? Math.round(((4 - ci.ansiedad) / 3) * 50 + (ci.claridad / 3) * 50) : 0;
+  const calma     = ci ? Math.round(((4 - ci.ansiedad) / 3) * 100) : 0;
+  return { fisico, sueno, presencia, calma };
+}
+
+// ── Render core elements in home ─────────────────────────────
+function renderCoreHomeElements() {
+  // Intention card
+  const intEl = document.getElementById('core-intention-card');
+  if (intEl) {
+    const chips = INTENTIONS.map(i =>
+      `<button class="int-chip${APP.core.intention===i?' selected':''}" data-int="${i}">${i}</button>`
+    ).join('');
+    intEl.innerHTML = `
+      <div class="int-label">Intención de la mañana</div>
+      <div class="int-question">"¿Desde qué estado quiero operar hoy?"</div>
+      <div class="int-chips">${chips}</div>
+    `;
+  }
+
+  // State bar 4 metrics
+  renderStateBarScores();
+
+  // Hombre 4 quote
+  const h4El = document.getElementById('core-h4-prompt');
+  if (h4El) {
+    h4El.textContent = getHombre4Prompt();
+  }
+
+  // Guard banner
+  const guardEl = document.getElementById('core-guard-banner');
+  if (guardEl) {
+    APP.core.guard = checkOverloadGuard();
+    if (APP.core.guard) {
+      guardEl.style.display = 'block';
+      guardEl.querySelector('.guard-msg').textContent =
+        'El sistema detectó señales de sobrecarga. Hoy lo esencial es suficiente.';
+    } else {
+      guardEl.style.display = 'none';
+    }
+  }
+
+  // Night link: show journal completion
+  const nightBtn = document.getElementById('btn-home-night');
+  if (nightBtn) {
+    const jDone = !!APP.core.journalToday?.q1;
+    nightBtn.textContent = jDone ? '🌙 Reflexión completada ✓' : '🌙 Reflexión nocturna';
+    nightBtn.classList.toggle('done', jDone);
+  }
+}
+
+function renderStateBarScores() {
+  const score = getInternalScore();
+  const bars = [
+    {id:'sb-fisico',  val: score.fisico, label:'Físico',   color:'var(--aqua)'},
+    {id:'sb-sueno',   val: score.sueno,  label:'Sueño',    color:'#607080'},
+    {id:'sb-presencia',val:score.presencia,label:'Presencia',color:'var(--gold-core)'},
+    {id:'sb-calma',   val: score.calma,  label:'Calma',    color:'var(--sage-core)'},
+  ];
+  bars.forEach(b => {
+    const el = document.getElementById(b.id);
+    if (!el) return;
+    const valEl = el.querySelector('.sb-val');
+    const barEl = el.querySelector('.sb-bar');
+    if (valEl) valEl.textContent = b.val > 0 ? b.val : '—';
+    if (barEl) { barEl.style.width = b.val + '%'; barEl.style.background = b.color; }
+  });
+}
+
+// ── Check-in dots render ──────────────────────────────────────
+function renderCheckInDots() {
+  if (!APP.core.checkIn) return;
+  ['energia','ansiedad','claridad'].forEach(metric => {
+    const val = APP.core.checkIn[metric] || 0;
+    for (let i=1; i<=3; i++) {
+      const dot = document.querySelector(`.ck-dot[data-ci="${metric}:${i}"]`);
+      if (!dot) continue;
+      dot.classList.remove('sel-low','sel-mid','sel-hi','sel-none');
+      if (i <= val) {
+        dot.classList.add(i===1?'sel-low':i===2?'sel-mid':'sel-hi');
+      }
+    }
+    const lbl = document.querySelector(`.ck-lbl-val[data-lbl="${metric}"]`);
+    if (lbl) {
+      const labels = {energia:['—','Baja','Media','Alta'],ansiedad:['—','Baja','Media','Alta'],claridad:['—','Baja','Media','Alta']};
+      lbl.textContent = labels[metric][val] || '—';
+    }
+  });
+}
+
+// ── Night page render ─────────────────────────────────────────
+function renderNight() {
+  const today   = new Date();
+  const todayKey = getTodayKey();
+  const jEntry  = APP.core.journalToday || DB.getTodayJournal(todayKey) || {};
+  const jStreak = DB.getJournalStreak();
+  const guard   = APP.core.guard;
+  const prompt  = getHombre4Prompt();
+
+  const dateStr = today.toLocaleDateString('es-PE',{weekday:'long',day:'numeric',month:'long'});
+
+  // If guard active: show only 1 question
+  const questions = guard
+    ? [{key:'q3', text:'¿Qué momento fue genuino y presente hoy?'}]
+    : [
+        {key:'q1', text:'¿Qué me dominó hoy?'},
+        {key:'q2', text:'¿Cómo reaccioné automáticamente?'},
+        {key:'q3', text:'¿Qué momento fue genuino y presente?'}
+      ];
+
+  const questionsHtml = questions.map((q,i) => `
+    <div class="journal-q">
+      <div class="jq-num">${String(i+1).padStart(2,'0')}</div>
+      <div class="jq-text">"${q.text}"</div>
+      <textarea class="jq-field" id="jq-${q.key}" rows="3" placeholder="Escribe aquí...">${jEntry[q.key]||''}</textarea>
+    </div>
+  `).join('');
+
+  const guardBadge = guard
+    ? `<div class="guard-night-badge">🛡️ Modo simplificado activo — Solo lo esencial</div>`
+    : '';
+
+  const streakBadge = jStreak > 1
+    ? `<div class="journal-streak">🌙 ${jStreak} noches seguidas</div>`
+    : '';
+
+  document.getElementById('page-night').innerHTML = `
+    <div class="page-inner">
+      <div style="display:flex;align-items:center;gap:12px;padding:20px 0 8px">
+        <button class="btn btn-ghost" id="btn-night-back" style="padding:8px 12px;font-size:12px">← Volver</button>
+        <div>
+          <div class="eyebrow" style="color:var(--gold-core)">Reflexión · Noche</div>
+          <h1 style="font-size:26px">Noche</h1>
+        </div>
+      </div>
+
+      <div class="night-date">${dateStr}</div>
+
+      ${guardBadge}
+      ${streakBadge}
+
+      <!-- Check-in rápido -->
+      <div class="checkin-card">
+        <div class="section-title-small">Check-in del día</div>
+        ${['energia','ansiedad','claridad'].map(m => `
+          <div class="ck-row">
+            <div class="ck-lbl">${m.charAt(0).toUpperCase()+m.slice(1)}</div>
+            <div class="ck-dots">
+              <div class="ck-dot" data-ci="${m}:1">Bajo</div>
+              <div class="ck-dot" data-ci="${m}:2">Medio</div>
+              <div class="ck-dot" data-ci="${m}:3">Alto</div>
+            </div>
+            <div class="ck-lbl-val" data-lbl="${m}">—</div>
+          </div>
+        `).join('')}
+      </div>
+
+      <!-- 3 Journal questions -->
+      <div class="section-title-small" style="margin:16px 0 8px">Cuarto Camino · ${guard?'1 pregunta':'3 preguntas'}</div>
+      ${questionsHtml}
+
+      <!-- Philosophical prompt -->
+      <div class="h4-quote-card">
+        <div class="h4q-label">Observación interna</div>
+        <div class="h4q-text">"${prompt}"</div>
+      </div>
+
+      <!-- Save button -->
+      <button class="btn btn-primary" id="btn-save-journal" style="width:100%;padding:14px;margin:16px 0">
+        Guardar reflexión
+      </button>
+
+      <div style="height:80px"></div>
+    </div>
+  `;
+
+  // Restore check-in dots
+  renderCheckInDots();
+
+  // Rebind save + back
+  document.getElementById('btn-save-journal')?.addEventListener('click', saveJournalEntry);
+  document.getElementById('btn-night-back')?.addEventListener('click', () => navigateTo('home'));
+}
+
+function saveJournalEntry() {
+  const todayKey = getTodayKey();
+  const q1 = document.getElementById('jq-q1')?.value || '';
+  const q2 = document.getElementById('jq-q2')?.value || '';
+  const q3 = document.getElementById('jq-q3')?.value || '';
+
+  if (!q1 && !q2 && !q3) { showToast('Escribe al menos una reflexión', 'error'); return; }
+
+  DB.saveJournalEntry(todayKey, q1, q2, q3);
+  APP.core.journalToday = {date:todayKey, q1, q2, q3};
+  saveToStorage();
+  showToast('Reflexión guardada ✓');
+
+  // Update night link on home when returning
+  setTimeout(() => {
+    const nightBtn = document.getElementById('btn-home-night');
+    if (nightBtn) { nightBtn.textContent = '🌙 Reflexión completada ✓'; nightBtn.classList.add('done'); }
+  }, 500);
+}
+
