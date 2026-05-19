@@ -33,6 +33,50 @@
       </div>
     </div>
 
+    <!-- CORE v3: Anti-overload guard banner -->
+    <div id="core-guard-banner" class="guard-banner" style="display:none">
+      <span class="guard-icon">🛡️</span>
+      <span class="guard-msg"></span>
+    </div>
+
+    <!-- CORE v3: Morning intention card -->
+    <div id="core-intention-card" class="intention-card" style="margin-bottom:12px">
+      <!-- rendered by renderCoreHomeElements() -->
+      <div class="int-label">Intención de la mañana</div>
+      <div class="int-question">"¿Desde qué estado quiero operar hoy?"</div>
+      <div class="int-chips">
+        <button class="int-chip" data-int="Calma">Calma</button>
+        <button class="int-chip" data-int="Presencia">Presencia</button>
+        <button class="int-chip" data-int="Claridad">Claridad</button>
+        <button class="int-chip" data-int="Paciencia">Paciencia</button>
+        <button class="int-chip" data-int="Foco">Foco</button>
+      </div>
+    </div>
+
+    <!-- CORE v3: State bar — 4 metrics -->
+    <div class="state-bar-4" style="margin-bottom:12px">
+      <div class="sb" id="sb-fisico">
+        <div class="sb-val">—</div>
+        <div class="sb-lbl">Físico</div>
+        <div class="sb-bar"></div>
+      </div>
+      <div class="sb" id="sb-sueno">
+        <div class="sb-val">—</div>
+        <div class="sb-lbl">Sueño</div>
+        <div class="sb-bar"></div>
+      </div>
+      <div class="sb" id="sb-presencia">
+        <div class="sb-val">—</div>
+        <div class="sb-lbl">Presencia</div>
+        <div class="sb-bar"></div>
+      </div>
+      <div class="sb" id="sb-calma">
+        <div class="sb-val">—</div>
+        <div class="sb-lbl">Calma</div>
+        <div class="sb-bar"></div>
+      </div>
+    </div>
+
     <!-- Coach message -->
     <div class="coach-msg" style="margin-bottom:14px">
       <p id="home-coach">Cargando tu rutina...</p>
@@ -74,6 +118,15 @@
       <button class="btn btn-secondary" id="btn-open-measures" style="flex:1;padding:11px">📏 Medidas</button>
       <button class="btn btn-ghost" data-page="today" onclick="APP.currentTab='nutrition';navigateTo('today')" style="flex:1;padding:11px">🥗 Nutrición</button>
     </div>
+
+    <!-- CORE v3: Hombre 4 philosophical prompt -->
+    <div class="h4-home-card" style="margin-bottom:10px">
+      <div class="h4h-symbol">◈</div>
+      <div class="h4h-prompt" id="core-h4-prompt">¿Estás reaccionando o respondiendo?</div>
+    </div>
+
+    <!-- CORE v3: Night ritual shortcut -->
+    <button class="btn btn-ghost" id="btn-home-night" style="width:100%;margin-bottom:10px;padding:11px;font-size:13px">🌙 Reflexión nocturna</button>
 
     <!-- Tomorrow -->
     <div class="tomorrow-card">
@@ -349,6 +402,15 @@
 </div>
 
 <!-- ════════════════ BOTTOM NAV ════════════════ -->
+<!-- ════════════════ PAGE: NOCHE ════════════════ -->
+<div class="page" id="page-night">
+  <div class="page-inner">
+    <div style="padding:40px 0;text-align:center;color:var(--text-dim)">
+      <div class="eyebrow">Cargando...</div>
+    </div>
+  </div>
+</div>
+
 <nav id="bottom-nav">
   <button class="nav-item active" data-page="home">
     <svg viewBox="0 0 24 24" stroke-width="1.8" fill="none">
@@ -370,12 +432,11 @@
     </svg>
     <span>Score</span>
   </button>
-  <button class="nav-item" data-page="exercises">
+  <button class="nav-item" data-page="night" id="btn-nav-night">
     <svg viewBox="0 0 24 24" stroke-width="1.8" fill="none">
-      <path d="M6.5 6.5h11M6.5 12h11M6.5 17.5h11"/>
-      <path d="M3 6.5h1M3 12h1M3 17.5h1M20 6.5h1M20 12h1M20 17.5h1"/>
+      <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
     </svg>
-    <span>Ejercicios</span>
+    <span>Noche</span>
   </button>
   <button class="nav-item" data-page="settings">
     <svg viewBox="0 0 24 24" stroke-width="1.8" fill="none">

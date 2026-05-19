@@ -956,3 +956,184 @@ circle.fill.red    { stroke: var(--red);    filter: drop-shadow(0 0 8px rgba(255
 
 /* ─── SAFE AREA ─── */
 .page-inner { padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
+
+
+/* ════════════════════════════════════════════════════════════════
+   CORE v3 — Intención · Check-in · Journaling · Guardia
+════════════════════════════════════════════════════════════════ */
+:root {
+  --gold-core:#B8873A;
+  --gold-core-l:rgba(184,135,58,.12);
+  --gold-core-b:rgba(184,135,58,.25);
+  --sage-core:#4DAA96;
+  --sage-core-l:rgba(77,170,150,.1);
+}
+
+/* ── Guard banner ── */
+.guard-banner {
+  background:var(--sage-core-l);
+  border:1px solid rgba(77,170,150,.25);
+  border-radius:12px;
+  padding:10px 14px;
+  margin-bottom:12px;
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+}
+.guard-icon { font-size:16px; flex-shrink:0; margin-top:1px }
+.guard-msg  { font-family:var(--font-body,sans-serif); font-size:12px; color:var(--sage-core); line-height:1.4 }
+
+/* ── Intention card ── */
+.intention-card {
+  background:var(--gold-core-l);
+  border:1px solid var(--gold-core-b);
+  border-radius:18px;
+  padding:16px;
+}
+.int-label {
+  font-size:9px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase;
+  color:var(--gold-core); opacity:.65; margin-bottom:6px;
+}
+.int-question {
+  font-size:14px; font-style:italic;
+  color:rgba(228,224,214,.85); line-height:1.35;
+  margin-bottom:12px;
+  font-family:Georgia,serif;
+}
+.int-chips { display:flex; flex-wrap:wrap; gap:6px }
+.int-chip {
+  padding:5px 13px; border-radius:999px; border:1px solid var(--gold-core-b);
+  background:transparent; color:var(--gold-core);
+  font-size:11px; font-weight:600; letter-spacing:.3px;
+  cursor:pointer; transition:all .2s;
+}
+.int-chip.selected { background:var(--gold-core); color:#030509; }
+.int-chip:active   { transform:scale(.95) }
+
+/* ── State bar 4 metrics ── */
+.state-bar-4 {
+  display:grid; grid-template-columns:1fr 1fr 1fr 1fr;
+  gap:5px;
+}
+.state-bar-4 .sb {
+  background:var(--card,#141D30);
+  border:1px solid rgba(255,255,255,.05);
+  border-radius:10px;
+  padding:9px 6px;
+  text-align:center;
+}
+.state-bar-4 .sb-val {
+  font-size:18px; font-weight:800; letter-spacing:-1px; line-height:1;
+  color:var(--text-primary,#E4E0D6);
+}
+.state-bar-4 .sb-lbl {
+  font-size:7px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+  color:var(--text-dim,rgba(160,155,140,.4)); margin-top:2px;
+}
+.state-bar-4 .sb-bar {
+  height:2px; border-radius:999px; margin-top:4px;
+  background:var(--aqua); opacity:.45; transition:width .4s ease;
+  width:0%;
+}
+
+/* ── Hombre 4 home card ── */
+.h4-home-card {
+  background:var(--card,#141D30);
+  border:1px solid var(--gold-core-b);
+  border-radius:14px;
+  padding:12px 14px;
+  display:flex; align-items:center; gap:10px;
+}
+.h4h-symbol { font-size:16px; color:var(--gold-core); opacity:.5; flex-shrink:0 }
+.h4h-prompt { font-size:12px; font-style:italic; color:rgba(220,215,200,.55); line-height:1.4; font-family:Georgia,serif }
+
+/* ── Night page ── */
+.night-date {
+  font-size:12px; font-style:italic; color:rgba(150,145,130,.4);
+  margin-bottom:14px;
+  font-family:Georgia,serif;
+}
+.guard-night-badge, .journal-streak {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:5px 12px; border-radius:999px;
+  font-size:10px; font-weight:700; letter-spacing:1px;
+  margin-bottom:12px;
+}
+.guard-night-badge { background:var(--sage-core-l); color:var(--sage-core); border:1px solid rgba(77,170,150,.2) }
+.journal-streak    { background:var(--gold-core-l); color:var(--gold-core); border:1px solid var(--gold-core-b) }
+
+.section-title-small {
+  font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+  color:rgba(150,145,130,.4); margin-bottom:8px;
+}
+
+/* ── Check-in card ── */
+.checkin-card {
+  background:var(--card,#141D30);
+  border:1px solid rgba(255,255,255,.05);
+  border-radius:16px;
+  padding:14px;
+  margin-bottom:6px;
+}
+.ck-row {
+  display:flex; align-items:center; gap:10px;
+  padding:7px 0;
+  border-bottom:1px solid rgba(255,255,255,.04);
+}
+.ck-row:last-child { border-bottom:none }
+.ck-lbl  { font-size:11px; font-weight:600; color:rgba(215,208,190,.6); flex-shrink:0; width:68px }
+.ck-lbl-val { font-size:10px; font-weight:700; letter-spacing:.5px; color:var(--gold-core); flex-shrink:0; min-width:40px; text-align:right }
+.ck-dots { display:flex; gap:5px; flex:1 }
+.ck-dot {
+  flex:1; height:10px; border-radius:999px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.04);
+  font-size:0; cursor:pointer; transition:all .2s;
+}
+.ck-dot.sel-low { background:rgba(77,170,150,.4);  border-color:rgba(77,170,150,.35) }
+.ck-dot.sel-mid { background:rgba(184,135,58,.35); border-color:var(--gold-core-b)   }
+.ck-dot.sel-hi  { background:rgba(160,80,80,.35);  border-color:rgba(160,80,80,.3)    }
+
+/* ── Journal questions ── */
+.journal-q {
+  background:var(--card,#141D30);
+  border:1px solid rgba(184,135,58,.12);
+  border-radius:16px;
+  padding:14px;
+  margin-bottom:10px;
+}
+.jq-num  { font-size:11px; font-weight:700; letter-spacing:-.5px; color:var(--gold-core); opacity:.4; margin-bottom:3px }
+.jq-text { font-size:15px; font-style:italic; color:rgba(228,224,214,.9); line-height:1.4; margin-bottom:10px; font-family:Georgia,serif }
+.jq-field {
+  width:100%; background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:10px; padding:10px;
+  font-size:13px; font-style:italic; color:rgba(215,208,190,.7);
+  font-family:Georgia,serif; line-height:1.55;
+  resize:vertical; min-height:70px;
+  transition:border-color .2s;
+}
+.jq-field:focus { outline:none; border-color:var(--gold-core-b) }
+.jq-field::placeholder { color:rgba(150,145,130,.3) }
+
+/* ── Hombre 4 night quote ── */
+.h4-quote-card {
+  background:var(--gold-core-l);
+  border:1px solid var(--gold-core-b);
+  border-radius:14px;
+  padding:14px;
+  margin:6px 0;
+}
+.h4q-label { font-size:8px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--gold-core); opacity:.6; margin-bottom:6px }
+.h4q-text  { font-size:14px; font-style:italic; color:rgba(220,215,200,.65); line-height:1.5; font-family:Georgia,serif }
+
+/* ── Night link button on home ── */
+#btn-home-night { 
+  border-color:var(--gold-core-b); color:var(--gold-core); 
+  font-size:13px; padding:11px;
+}
+#btn-home-night.done { 
+  background:var(--gold-core-l); 
+  color:var(--sage-core); 
+  border-color:rgba(77,170,150,.3);
+}

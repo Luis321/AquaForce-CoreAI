@@ -1,5 +1,5 @@
 // AquaForce Training v2 — Service Worker
-const CACHE = 'aquaforce-v2.5';
+const CACHE = 'aquaforce-v2.1';
 const ASSETS = [
   './', './index.html', './styles.css', './app.js', './manifest.json',
   'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js',
