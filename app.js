@@ -298,10 +298,12 @@ const APP = {
   },
   // ── CORE v3 ──────────────────────────────────────────────────
   core: {
-    intention: '',            // "calma" | "presencia" | "claridad" | "paciencia" | "foco" | custom
-    checkIn: null,            // {energia:1|2|3, ansiedad:1|2|3, claridad:1|2|3, date:''}
+    intentions: [],           // multi-select: ['calma','presencia',...]
+    intention: '',            // legacy single (kept for compat)
+    checkIn: null,            // {energia:1|2|3, ansiedad:1|2|3, claridad:1|2|3, sueno:number, date:''}
     journalToday: null,       // {date:'', q1:'', q2:'', q3:'', saved:false}
-    guard: false              // anti-overload guard active
+    guard: false,             // anti-overload guard active
+    ritualChecks: {}          // {date:'', respiracion:bool, observacion:bool}
   }
 };
 
@@ -448,7 +450,8 @@ const DB = {
       const cols = rows[0].columns;
       return rows[0].values.map(r => Object.fromEntries(cols.map((c,i) => [c,r[i]])));
     }
-    return APP.sessions.filter(s => s.date === date);
+    return APP.sessions.filter(s => s.date === date)
+      .map(s => ({...s, session_type: s.session_type || s.type || ''}));
   },
 
   getRecentSessions(n = 14) {
@@ -460,7 +463,8 @@ const DB = {
       const cols = rows[0].columns;
       return rows[0].values.map(r => Object.fromEntries(cols.map((c,i) => [c,r[i]])));
     }
-    return [...APP.sessions].sort((a,b) => b.date.localeCompare(a.date)).slice(0, n);
+    return [...APP.sessions].sort((a,b) => b.date.localeCompare(a.date)).slice(0, n)
+      .map(s => ({...s, session_type: s.session_type || s.type || ''}));
   },
 
   saveWeight(exId, kg) {
@@ -656,7 +660,20 @@ function loadFromStorage() {
 
     const mealLog = localStorage.getItem('af_meal_log');
     const coreRaw = localStorage.getItem('af_core_v3');
-    if (coreRaw) { try { Object.assign(APP.core, JSON.parse(coreRaw)); } catch(e){} }
+    if (coreRaw) {
+      try {
+        const saved = JSON.parse(coreRaw);
+        Object.assign(APP.core, saved);
+        // Ensure intentions is array
+        if (!Array.isArray(APP.core.intentions)) {
+          APP.core.intentions = APP.core.intention ? APP.core.intention.split(',').filter(Boolean) : [];
+        }
+        // Ensure ritualChecks reset if new day
+        if (APP.core.ritualChecks?.date !== getTodayKey()) {
+          APP.core.ritualChecks = {date: getTodayKey()};
+        }
+      } catch(e){}
+    }
     if (mealLog) APP.mealCompleted = JSON.parse(mealLog);
 
     const completed = localStorage.getItem('af_completed_v2');
@@ -863,6 +880,7 @@ function navigateTo(page) {
   if (page === 'exercises') renderExerciseLibrary();
   if (page === 'settings')  renderSettings();
   if (page === 'night')     renderNight();
+  if (page === 'evolucion') renderEvolucion();
 }
 
 function switchTab(tab) {
@@ -1267,7 +1285,7 @@ function completeSession(type) {
 
   DB.saveSession(sessionData);
   showToast(`✅ Sesión ${type.toUpperCase()} guardada · Score: ${sessionData.score}`, 'success');
-  navigateTo('dashboard');
+  navigateTo('evolucion');
 }
 
 function setTodayMode(mode) {
@@ -1964,12 +1982,15 @@ function bindEvents() {
     if (!chip) return;
     const val = chip.dataset.int;
     if (!val) return;
-    APP.core.intention = val;
-    DB.saveIntention(getTodayKey(), val);
-    document.querySelectorAll('.int-chip').forEach(c => c.classList.remove('selected'));
-    chip.classList.add('selected');
+    // Multi-select toggle
+    const idx = APP.core.intentions.indexOf(val);
+    if (idx >= 0) APP.core.intentions.splice(idx,1); else APP.core.intentions.push(val);
+    APP.core.intention = APP.core.intentions.join(',');
+    DB.saveIntention(getTodayKey(), APP.core.intention);
+    chip.classList.toggle('selected', APP.core.intentions.includes(val));
     saveToStorage();
-    showToast('Intención: ' + val);
+    const lbl = APP.core.intentions.length > 0 ? APP.core.intentions.join(' · ') : 'Ninguna';
+    showToast('Intención: ' + lbl);
   });
 
   // Check-in dots
@@ -1977,14 +1998,41 @@ function bindEvents() {
     const dot = e.target.closest('.ck-dot[data-ci]');
     if (!dot) return;
     const [metric, val] = dot.dataset.ci.split(':');
-    if (!APP.core.checkIn) APP.core.checkIn = {energia:0,ansiedad:0,claridad:0,date:getTodayKey()};
+    if (!APP.core.checkIn) APP.core.checkIn = {energia:0,ansiedad:0,claridad:0,sueno:0,date:getTodayKey()};
     APP.core.checkIn[metric] = parseInt(val);
     APP.core.checkIn.date = getTodayKey();
     DB.saveCheckIn(getTodayKey(), APP.core.checkIn.energia||0, APP.core.checkIn.ansiedad||0,
-      APP.core.checkIn.claridad||0, 0);
+      APP.core.checkIn.claridad||0, APP.core.checkIn.sueno||0);
     saveToStorage();
     renderCheckInDots();
     renderStateBarScores();
+  });
+
+  // Sleep quick-select buttons
+  document.addEventListener('click', e => {
+    const sleepBtn = e.target.closest('.sleep-btn');
+    if (!sleepBtn) return;
+    const h = parseFloat(sleepBtn.dataset.h);
+    if (!APP.core.checkIn) APP.core.checkIn = {energia:0,ansiedad:0,claridad:0,sueno:0,date:getTodayKey()};
+    APP.core.checkIn.sueno = h;
+    APP.core.checkIn.date = getTodayKey();
+    DB.saveCheckIn(getTodayKey(), APP.core.checkIn.energia||0, APP.core.checkIn.ansiedad||0,
+      APP.core.checkIn.claridad||0, h);
+    saveToStorage();
+    document.querySelectorAll('.sleep-btn').forEach(b => b.classList.toggle('active', parseFloat(b.dataset.h)===h));
+    renderStateBarScores();
+    showToast('Sueño: ' + h + 'h registrado');
+  });
+
+  // Morning ritual checks
+  document.addEventListener('click', e => {
+    const ritBtn = e.target.closest('.ritual-item-row[data-manual]');
+    if (!ritBtn) return;
+    const key = ritBtn.dataset.manual;
+    if (!APP.core.ritualChecks) APP.core.ritualChecks = {date:getTodayKey()};
+    APP.core.ritualChecks[key] = !APP.core.ritualChecks[key];
+    saveToStorage();
+    renderMorningRitual();
   });
 
   // Journal save
@@ -2017,7 +2065,10 @@ async function init() {
   // ── CORE v3: load today's data ───────────────────────────────
   const todayKey = getTodayKey();
   const savedIntention = DB.getTodayIntention(todayKey);
-  if (savedIntention) APP.core.intention = savedIntention;
+  if (savedIntention) {
+    APP.core.intention = savedIntention;
+    APP.core.intentions = savedIntention ? savedIntention.split(',').filter(Boolean) : [];
+  }
   const savedCheckIn = DB.getTodayCheckIn(todayKey);
   if (savedCheckIn) APP.core.checkIn = savedCheckIn;
   const savedJournal = DB.getTodayJournal(todayKey);
@@ -2033,6 +2084,226 @@ async function init() {
 }
 
 document.addEventListener('DOMContentLoaded', init);
+// ════════════════════════════════════════════════════════════════
+// 20b. CORE v3 ADDITIONS — Ritual · Sueño · Evolución · Radar
+// ════════════════════════════════════════════════════════════════
+
+// ── Morning ritual items ──────────────────────────────────────
+function getMorningRitualItems() {
+  const sched = getTodaySchedule();
+  const amDone = APP.completedExercises.am.size > 0;
+  const intDone = APP.core.intentions.length > 0;
+  const desayunoDone = !!APP.mealCompleted['desayuno'];
+  const rc = APP.core.ritualChecks || {};
+
+  return [
+    { key:'respiracion', label:'Respiración 4-7-8 · 3 min', cat:'Presencia',
+      done: !!rc.respiracion, manual: true },
+    { key:'entrenamiento', label:'Entrenamiento AM · ' + (sched?.am?.name || 'Sesión'),
+      cat:'Físico', done: amDone, manual: false },
+    { key:'intencion', label:'Intención del día escrita', cat:'Mente',
+      done: intDone, manual: false },
+    { key:'observacion', label:'Observación emocional · 2 min', cat:'Emoción',
+      done: !!rc.observacion, manual: true },
+    { key:'desayuno', label:'Nutrición · Desayuno', cat:'Físico',
+      done: desayunoDone, manual: false },
+  ];
+}
+
+function renderMorningRitual() {
+  const el = document.getElementById('core-ritual-section');
+  if (!el) return;
+  const items = getMorningRitualItems();
+  const done = items.filter(i=>i.done).length;
+  const total = items.length;
+  const catColor = {Presencia:'var(--gold-core)',Físico:'var(--aqua)',Mente:'#8B6BC0',Emoción:'var(--sage-core)'};
+
+  el.innerHTML = `
+    <div class="ritual-card">
+      <div class="ritual-hdr">
+        <div class="ritual-title">☀️ Ritual de la mañana</div>
+        <div class="ritual-count">${done}/${total} completados</div>
+      </div>
+      ${items.map(it => `
+        <div class="ritual-item-row${it.manual?' ritual-manual':''}"
+             ${it.manual?`data-manual="${it.key}"`:''}
+             style="cursor:${it.manual?'pointer':'default'}">
+          <div class="ritual-chk${it.done?' ritual-chk-done':''}">
+            ${it.done?'✓':''}
+          </div>
+          <div class="ritual-item-text">${it.label}</div>
+          <div class="ritual-cat" style="background:${catColor[it.cat]||'#607080'}22;color:${catColor[it.cat]||'#607080'};border-color:${catColor[it.cat]||'#607080'}44">${it.cat}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// ── Evolution metrics (6 axes for radar) ─────────────────────
+function getEvolutionMetrics() {
+  const ci      = APP.core.checkIn;
+  const streak  = getStreak();
+  const week    = getWeekStats();
+  const jStreak = DB.getJournalStreak();
+
+  const presencia   = ci ? Math.round(((4-ci.ansiedad)/3)*50 + (ci.claridad/3)*50) : 60;
+  const calma       = ci ? Math.round(((4-ci.ansiedad)/3)*100) : 60;
+  const disciplina  = Math.min(100, Math.round((streak/7)*50 + (week.completed/7)*50));
+  const regulacion  = Math.min(100, Math.round((jStreak/7)*60 + (ci?(ci.claridad/3)*40:20)));
+  const consistencia = Math.min(100, Math.round(week.completed/7*100));
+  const foco        = ci ? Math.round((ci.claridad/3)*100) : 50;
+
+  return { presencia, calma, consistencia, regulacion, disciplina, foco };
+}
+
+// ── Radar SVG generator ───────────────────────────────────────
+function generateRadarSVG(metrics) {
+  const cx=100, cy=100, maxR=65;
+  // 6 axes: presencia(top), calma(top-right), consistencia(btm-right),
+  //         regulacion(btm), disciplina(btm-left), foco(top-left)
+  const axes = [
+    {label:'PRESENCIA',   val:metrics.presencia,   a:-90},
+    {label:'CALMA',       val:metrics.calma,        a:-30},
+    {label:'CONS.',       val:metrics.consistencia, a:30},
+    {label:'REGULACIÓN',  val:metrics.regulacion,   a:90},
+    {label:'DISCIPLINA',  val:metrics.disciplina,   a:150},
+    {label:'FOCO',        val:metrics.foco,         a:210},
+  ];
+  const toRad = d => d * Math.PI / 180;
+  const pt = (r, a) => `${cx + r*Math.cos(toRad(a))},${cy + r*Math.sin(toRad(a))}`;
+
+  // Background rings at 25,50,75,100%
+  const rings = [0.25,0.5,0.75,1.0].map(p => {
+    const pts = axes.map(ax => pt(maxR*p, ax.a)).join(' ');
+    return `<polygon points="${pts}" fill="none" stroke="rgba(255,255,255,${p===1.0?'.08':'.04'})" stroke-width="${p===1.0?'.8':'.5'}"/>`;
+  }).join('');
+
+  // Axis lines
+  const axisLines = axes.map(ax =>
+    `<line x1="${cx}" y1="${cy}" x2="${cx+maxR*Math.cos(toRad(ax.a))}" y2="${cy+maxR*Math.sin(toRad(ax.a))}" stroke="rgba(196,148,58,.15)" stroke-width=".5"/>`
+  ).join('');
+
+  // Data polygon
+  const dataPts = axes.map(ax => pt(maxR*(ax.val/100), ax.a)).join(' ');
+  const dataPolygon = `<polygon points="${dataPts}" fill="rgba(196,148,58,.15)" stroke="rgba(196,148,58,.7)" stroke-width="1.5"/>`;
+  const dataDots = axes.map(ax =>
+    `<circle cx="${cx+maxR*(ax.val/100)*Math.cos(toRad(ax.a))}" cy="${cy+maxR*(ax.val/100)*Math.sin(toRad(ax.a))}" r="3" fill="var(--gold-core)"/>`
+  ).join('');
+
+  // Labels
+  const labelOffset = maxR + 14;
+  const labels = axes.map(ax => {
+    const lx = cx + labelOffset*Math.cos(toRad(ax.a));
+    const ly = cy + labelOffset*Math.sin(toRad(ax.a));
+    return `<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="central" style="font-family:Rajdhani,sans-serif;font-size:8px;font-weight:700;letter-spacing:1px;fill:rgba(200,195,175,.4)">${ax.label}</text>`;
+  }).join('');
+
+  return `<svg viewBox="0 0 200 200" class="radar-svg">${rings}${axisLines}${dataPolygon}${dataDots}${labels}</svg>`;
+}
+
+// ── Evolución page ────────────────────────────────────────────
+function renderEvolucion() {
+  const metrics  = getEvolutionMetrics();
+  const score    = getInternalScore();
+  const todaySess = getTodaySessionsData();
+  const bestSess = todaySess.reduce((b,s)=>(s.score||0)>(b?.score||0)?s:b, null);
+  const physScore = bestSess?.score || 0;
+  const streak   = getStreak();
+  const week     = getWeekStats();
+  const jEntry   = APP.core.journalToday;
+  const currentLevel = 4; // from metrics: would auto-calc in future
+
+  const LEVELS = [
+    {n:1,name:'Impulso',ref:'Hombre 1'},
+    {n:2,name:'Reacción',ref:'Hombre 2'},
+    {n:3,name:'Conciencia',ref:'Hombre 3'},
+    {n:4,name:'Integración',ref:'Hombre 4'},
+    {n:5,name:'Presencia',ref:'Hombre 5'},
+    {n:6,name:'Estabilidad',ref:'Hombre 6'},
+    {n:7,name:'Maestría',ref:'Hombre 7'},
+  ];
+  const curLv = LEVELS[currentLevel-1];
+  const lvProgress = 62; // % to next level
+
+  const radarSVG = generateRadarSVG(metrics);
+
+  const metricCards = [
+    {label:'PRESENCIA', val:metrics.presencia, color:'var(--gold-core)'},
+    {label:'CALMA',     val:metrics.calma,     color:'var(--sage-core)'},
+    {label:'DISCIPLINA',val:metrics.disciplina,color:'var(--aqua)'},
+    {label:'REGULACIÓN',val:metrics.regulacion,color:'#8B6BC0'},
+  ].map(m => `
+    <div class="evo-metric-card">
+      <div class="emc-lbl">${m.label}</div>
+      <div class="emc-val" style="color:${m.color}">${m.val}</div>
+      <div class="emc-bar"><div class="emc-bar-fill" style="width:${m.val}%;background:${m.color}"></div></div>
+    </div>
+  `).join('');
+
+  const levelDots = LEVELS.map(l => `
+    <div class="lv-dot${l.n < currentLevel?' lv-past':l.n===currentLevel?' lv-now':' lv-future'}"
+         title="${l.name}"></div>
+  `).join('');
+
+  document.getElementById('page-evolucion').innerHTML = `
+    <div class="page-inner">
+      <div style="padding:20px 0 8px">
+        <div class="eyebrow" style="color:var(--gold-core)">Tu Evolución</div>
+        <h1 style="font-size:32px">${curLv.name}</h1>
+      </div>
+
+      <!-- Level card -->
+      <div class="evo-level-card">
+        <div class="elc-top">
+          <div class="elc-num">${currentLevel}</div>
+          <div class="elc-right">
+            <div class="elc-name">${curLv.name}</div>
+            <div class="elc-ref">${curLv.ref} · Gurdjieff</div>
+            <div class="elc-desc">Cuerpo, mente y emoción empiezan a operar como un sistema.</div>
+          </div>
+        </div>
+        <div class="elc-bar-track"><div class="elc-bar-fill" style="width:${lvProgress}%"></div></div>
+        <div class="elc-dots">${levelDots}</div>
+      </div>
+
+      <!-- Radar -->
+      <div class="evo-section-label">MÉTRICAS DE INTEGRACIÓN</div>
+      <div class="evo-radar-wrap">${radarSVG}</div>
+
+      <!-- 4 metric cards -->
+      <div class="evo-metrics-grid">${metricCards}</div>
+
+      <!-- Physical score today -->
+      <div class="evo-section-label">ESTADO FÍSICO HOY</div>
+      <div class="evo-phys-row">
+        <div class="evo-phys-score" style="color:${physScore>=70?'var(--aqua)':'var(--text3)'}">
+          ${physScore > 0 ? physScore : '—'}
+        </div>
+        <div>
+          <div style="font-size:12px;color:var(--text2)">Score del día</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:2px">
+            Racha: ${streak} días · Semana: ${week.completed}/7
+          </div>
+        </div>
+      </div>
+
+      <!-- Auto-observación -->
+      <div class="evo-section-label">AUTO-OBSERVACIÓN DE HOY</div>
+      <div class="evo-obs-card">
+        ${jEntry?.q1
+          ? `<div class="evo-obs-text">"${jEntry.q1}"</div>
+             <div class="evo-obs-hint">Reflexión nocturna · ${getTodayKey()}</div>`
+          : `<div class="evo-obs-hint" style="color:var(--text3);font-style:italic">
+              Sin reflexión aún. La página <strong>Noche</strong> te espera.
+             </div>`
+        }
+      </div>
+
+      <div style="height:80px"></div>
+    </div>
+  `;
+}
+
 
 // ════════════════════════════════════════════════════════════════
 // 20. CORE v3 — Intención · Check-in · Journaling · Guardia
@@ -2072,10 +2343,14 @@ function getInternalScore() {
   const todaySess = getTodaySessionsData();
   const fisico = todaySess.length > 0 ? Math.max(...todaySess.map(s=>s.score||0)) : 0;
   const ci = APP.core.checkIn;
-  const sueno    = ci?.sueno > 0 ? Math.round(Math.min(ci.sueno / 8 * 100, 100)) : 0;
-  const presencia = ci ? Math.round(((4 - ci.ansiedad) / 3) * 50 + (ci.claridad / 3) * 50) : 0;
-  const calma     = ci ? Math.round(((4 - ci.ansiedad) / 3) * 100) : 0;
-  return { fisico, sueno, presencia, calma };
+  // Sueño: stored as raw hours, shown as hours text
+  const suenoH  = ci?.sueno > 0 ? ci.sueno : 0;
+  const suenoPct = suenoH > 0 ? Math.round(Math.min(suenoH / 8 * 100, 100)) : 0;
+  // Presencia: inverse_ansiedad(50%) + claridad(50%)
+  const presencia = ci ? Math.round(((4-ci.ansiedad)/3)*50 + (ci.claridad/3)*50) : 0;
+  // Calma: inverse of ansiedad
+  const calma   = ci ? Math.round(((4-ci.ansiedad)/3)*100) : 0;
+  return { fisico, sueno: suenoPct, suenoH, presencia, calma };
 }
 
 // ── Render core elements in home ─────────────────────────────
@@ -2084,10 +2359,10 @@ function renderCoreHomeElements() {
   const intEl = document.getElementById('core-intention-card');
   if (intEl) {
     const chips = INTENTIONS.map(i =>
-      `<button class="int-chip${APP.core.intention===i?' selected':''}" data-int="${i}">${i}</button>`
+      `<button class="int-chip${APP.core.intentions.includes(i)?' selected':''}" data-int="${i}">${i}</button>`
     ).join('');
     intEl.innerHTML = `
-      <div class="int-label">Intención de la mañana</div>
+      <div class="int-label">Intención de la mañana <span style="opacity:.4;font-weight:400;font-size:8px">· elige una o más</span></div>
       <div class="int-question">"¿Desde qué estado quiero operar hoy?"</div>
       <div class="int-chips">${chips}</div>
     `;
@@ -2122,23 +2397,26 @@ function renderCoreHomeElements() {
     nightBtn.textContent = jDone ? '🌙 Reflexión completada ✓' : '🌙 Reflexión nocturna';
     nightBtn.classList.toggle('done', jDone);
   }
+
+  // Morning ritual
+  renderMorningRitual();
 }
 
 function renderStateBarScores() {
   const score = getInternalScore();
   const bars = [
-    {id:'sb-fisico',  val: score.fisico, label:'Físico',   color:'var(--aqua)'},
-    {id:'sb-sueno',   val: score.sueno,  label:'Sueño',    color:'#607080'},
-    {id:'sb-presencia',val:score.presencia,label:'Presencia',color:'var(--gold-core)'},
-    {id:'sb-calma',   val: score.calma,  label:'Calma',    color:'var(--sage-core)'},
+    {id:'sb-fisico',  val: score.fisico, disp: score.fisico>0?score.fisico:'—', color:'var(--aqua)'},
+    {id:'sb-sueno',   val: score.sueno,  disp: score.suenoH>0?(score.suenoH+'h'):'—', color:'#607080'},
+    {id:'sb-presencia',val:score.presencia, disp: score.presencia>0?score.presencia:'—', color:'var(--gold-core)'},
+    {id:'sb-calma',   val: score.calma,  disp: score.calma>0?score.calma:'—', color:'var(--sage-core)'},
   ];
   bars.forEach(b => {
     const el = document.getElementById(b.id);
     if (!el) return;
     const valEl = el.querySelector('.sb-val');
     const barEl = el.querySelector('.sb-bar');
-    if (valEl) valEl.textContent = b.val > 0 ? b.val : '—';
-    if (barEl) { barEl.style.width = b.val + '%'; barEl.style.background = b.color; }
+    if (valEl) valEl.textContent = b.disp;
+    if (barEl) { barEl.style.width = (b.val||0) + '%'; barEl.style.background = b.color; }
   });
 }
 
