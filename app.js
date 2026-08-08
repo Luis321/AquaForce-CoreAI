@@ -181,66 +181,66 @@ const DAILY_SCHEDULE = {
 // 2. MEAL PLAN DIARIO (del Excel)
 // ════════════════════════════════════════════════════════════════
 const MEAL_PLAN = {
-  1: { // Lunes — Pierna hipertrofia
-    kcal: 1650, type: 'pierna',
-    whey: ['post_am'],
-    whey_note: '1 scoop con agua — inmediatamente post-pierna AM',
-    adjustment: '+1 plátano pre-entreno · +30g avena extra en desayuno',
-    desayuno: '🥞 Panqueque de avena (3 cdas avena + 3 claras + ½ plátano + 1½ cdta mantequilla de maní + 1 cda linaza molida) + 150 ml kéfir\n+ 1 plátano extra PRE-ENTRENO · +30g avena',
-    almuerzo: '150 g pollo + 1 papa + ensalada brócoli + 1 cdta aceite + 6 aceitunas',
-    snack: '1 manzana + 10 almendras',
-    cena: '🥞 Panqueque (3 claras + avena + 1 cda mantequilla de maní + 1 cdta semillas de girasol)',
-    prot: 170
+  1: { // Lunes — Activación ligera, sin carga
+    kcal: 1400, type: 'activacion',
+    whey: [],
+    whey_note: 'Sin whey hoy — día de activación sin carga',
+    adjustment: 'Día de mantenimiento. Sin plátano extra pre-entreno — la sesión de hoy no lleva carga externa.',
+    desayuno: '🥣 Avena cocida + ½ tz arándanos + 1 cdta mantequilla de maní + 1 cdta chía + 100 ml kéfir + 3 claras',
+    almuerzo: '150 g pollo a la plancha + ½ tz quinua + ensalada cocida + 1 cdta aceite',
+    snack: '1 manzana + 8 almendras',
+    cena: '🍳 Omelette (3 claras) + ½ tz zapallito + 1 cdta semillas de girasol',
+    prot: 160
   },
-  2: { // Martes — Doble sesión
+  2: { // Martes — Pierna + Piscina (día de mayor carga)
     kcal: 1700, type: 'doble',
     whey: ['post_am', 'post_pm'],
-    whey_note: '2 scoops hoy: post AM (casa) y post PM (gym)',
-    adjustment: '+yogurt griego post-gym · +½ plátano post-AM',
-    desayuno: '🥣 Avena cocida + ¾ tz arándanos + 1½ cdta mantequilla de maní + 1 cdta chía + 1 cda linaza molida + 150 ml kéfir + 3 claras',
+    whey_note: '2 scoops hoy: post-pierna (AM) y post-piscina (PM)',
+    adjustment: '+1 plátano pre-entreno AM · +yogurt griego post-piscina',
+    desayuno: '🥣 Avena cocida + ¾ tz arándanos + 1½ cdta mantequilla de maní + 1 cdta chía + 1 cda linaza molida + 150 ml kéfir + 3 claras\n+ 1 plátano extra PRE-ENTRENO',
     almuerzo: '150 g pollo a la plancha + ½ tz quinua + ensalada cocida + 1 cdta aceite',
     snack: '½ plátano + 10 maníes',
-    cena: '2 huevos sancochados + ½ tz zapallito + 20 g palta + 1 cdta semillas de girasol\n+ Yogurt griego 170g POST-GYM',
+    cena: '2 huevos sancochados + ½ tz zapallito + 20 g palta + 1 cdta semillas de girasol\n+ Yogurt griego 170g POST-PISCINA',
     prot: 175
   },
-  3: { // Miércoles — Recovery
-    kcal: 1400, type: 'recovery',
+  3: { // Miércoles — Activación ligera, sin carga
+    kcal: 1400, type: 'activacion',
     whey: [],
-    whey_note: 'Sin whey hoy — día de recuperación',
-    adjustment: 'Plan base exacto. Reduce carbos en cena si no entrenaste fuerte.',
+    whey_note: 'Sin whey hoy — día de activación sin carga',
+    adjustment: 'Plan base de mantenimiento. Segunda sesión de activación de la semana, después de la pierna del martes.',
     desayuno: '½ plátano + 3 claras + 30 g pollo + espinaca + 1 salmas + 30 g palta + 1 cdta chía + 100 ml kéfir + 1 cda semillas de girasol',
     almuerzo: '150 g carne magra + 1 papa blanca + ensalada cocida + 1 cdta aceite + 6 aceitunas',
     snack: '1 pera + 6 almendras',
     cena: '🥞 Panqueque de avena (3 claras + ½ manzana + 1 cdta mantequilla de maní + 1 cdta linaza molida)',
     prot: 160
   },
-  4: { // Jueves — Pierna hipertrofia
-    kcal: 1650, type: 'pierna',
-    whey: ['post_am'],
-    whey_note: '1 scoop con agua — post-pierna AM',
-    adjustment: '+1 plátano pre-entreno · +30g avena extra',
-    desayuno: '🥞 Panqueque de avena (3 claras + ½ manzana + 1½ cdta mantequilla de maní + 1 cdta chía + 1 cda semillas de girasol) + 150 ml kéfir + ½ tz fresas\n+ 1 plátano PRE-ENTRENO',
-    almuerzo: '150 g pollo deshilachado + 70 g fideos integrales + ensalada tomate/espinaca + 1 cdta aceite',
-    snack: '1 manzana + 10 maníes',
-    cena: '1 huevo sancochado + 1 salmas + ensalada verde + 25 g palta + 1 cdta linaza molida',
-    prot: 170
-  },
-  5: { // Viernes — Doble sesión
+  4: { // Jueves — Pierna + Piscina (sube carga vs martes)
     kcal: 1700, type: 'doble',
     whey: ['post_am', 'post_pm'],
-    whey_note: '2 scoops: post AM (casa) y post PM (gym)',
-    adjustment: '+yogurt griego post-gym',
-    desayuno: '½ plátano + 3 claras + 30 g pollo + espinaca + 1 salmas + 30 g palta + 1 cdta chía + 150 ml kéfir + 1 cda semillas de girasol',
-    almuerzo: '150 g pollo a la plancha + ½ tz arroz integral + ensalada brócoli + 1 cdta aceite + 6 aceitunas',
-    snack: '1 manzana + 8 almendras',
-    cena: '🥞 Panqueque (3 claras + avena + 1 cda mantequilla de maní + 1 cdta linaza molida)\n+ Yogurt griego 170g POST-GYM',
+    whey_note: '2 scoops hoy: post-pierna (AM, carga más alta que el martes) y post-piscina (PM)',
+    adjustment: '+1 plátano pre-entreno AM · +30g avena extra · +yogurt griego post-piscina',
+    desayuno: '🥞 Panqueque de avena (3 claras + ½ manzana + 1½ cdta mantequilla de maní + 1 cdta chía + 1 cda semillas de girasol) + 150 ml kéfir + ½ tz fresas\n+ 1 plátano PRE-ENTRENO · +30g avena extra',
+    almuerzo: '150 g pollo deshilachado + 70 g fideos integrales + ensalada tomate/espinaca + 1 cdta aceite',
+    snack: '1 manzana + 10 maníes',
+    cena: '1 huevo sancochado + 1 salmas + ensalada verde + 25 g palta + 1 cdta linaza molida\n+ Yogurt griego 170g POST-PISCINA',
     prot: 175
   },
-  6: { // Sábado — Activación suave
+  5: { // Viernes — Torso · Empuje (después de las 6pm)
+    kcal: 1600, type: 'empuje',
+    whey: ['post_pm'],
+    whey_note: '1 scoop post-entreno — al terminar Torso/Empuje después de las 6pm',
+    adjustment: 'Sin carga extra en el desayuno — el entrenamiento es en la noche. Snack ligero antes de la sesión si llegas con hambre.',
+    desayuno: '½ plátano + 3 claras + 30 g pollo + espinaca + 1 salmas + 30 g palta + 1 cdta chía + 150 ml kéfir + 1 cda semillas de girasol',
+    almuerzo: '150 g pollo a la plancha + ½ tz arroz integral + ensalada brócoli + 1 cdta aceite + 6 aceitunas',
+    snack: '1 manzana + 8 almendras · +½ plátano si entrenas después de las 6pm con hambre',
+    cena: '🥞 Panqueque (3 claras + avena + 1 cda mantequilla de maní + 1 cdta linaza molida)\n+ Yogurt griego 170g POST-ENTRENO (Torso/Empuje)',
+    prot: 165
+  },
+  6: { // Sábado — Descanso / movilidad opcional (mantenimiento)
     kcal: 1400, type: 'suave',
     whey: [],
     whey_note: 'Sin whey hoy',
-    adjustment: 'Plan base. Duerme bien esta noche — mañana es aguas abiertas.',
+    adjustment: 'Plan base de mantenimiento. Movilidad opcional en el hueco 15–18h no cambia el plan. Duerme bien — mañana es aguas abiertas.',
     desayuno: '🥣 Avena cocida + ½ tz fresas + 1½ cdta mantequilla de maní + 1 cdta chía + 150 ml kéfir + 1 cda linaza molida + 3 claras',
     almuerzo: '150 g pollo a la plancha + ½ tz quinua + ensalada cocida + 1 cda palta + 1 cdta aceite',
     snack: '1 pera + 10 maníes',
@@ -831,10 +831,12 @@ function getRecommendations() {
   const streak = getStreak();
   const dow = APP.currentDayOfWeek;
   if (streak > 7) recs.push('Llevas '+streak+' días seguidos. Asegúrate de dormir 7h+ los días sin clase.');
-  if (stats.completed >= 5) recs.push('Esta semana sube 2.5 kg en sentadilla si completaste todas las reps el lunes y jueves.');
-  if (dow === 1 || dow === 4) recs.push('Día de pierna: come el desayuno reforzado antes de entrenar y toma el whey inmediatamente después.');
-  if (dow === 2 || dow === 5) recs.push('Día doble: recuerda el segundo scoop de whey post-gym en la tarde.');
-  if (dow === 3) recs.push('Recovery activo hoy. No te lo saltes — es parte del plan.');
+  if (stats.completed >= 5) recs.push('Esta semana sube 2.5 kg en sentadilla si completaste todas las reps el martes y jueves.');
+  if (dow === 2 || dow === 4) recs.push('Día de pierna + piscina: desayuno reforzado antes de la sentadilla y whey post-entreno en ambos bloques (AM fuerza y PM piscina).');
+  if (dow === 1 || dow === 3) recs.push('Activación ligera hoy, sin carga. Día de mantenimiento — reduce carbohidratos frente a los días de pierna.');
+  if (dow === 5) recs.push('Torso/Empuje después de las 6pm: ventana de proteína post-entreno al terminar la sesión.');
+  if (dow === 6) recs.push('Descanso o movilidad opcional hoy. Día de mantenimiento.');
+  if (dow === 0) recs.push('Aguas abiertas: día de entrenamiento largo. Mantén carbohidratos altos y whey post-natación.');
   if (!recs.length) recs.push('Mantén el volumen. Estás en zona de adaptación óptima.');
   return recs;
 }
@@ -1104,14 +1106,17 @@ function renderNutritionContent(container) {
   }
 
   const TYPE_LABELS = {
-    pierna:   '🦵 Pierna Hipertrofia',
-    doble:    '⚡ Día Doble (AM + PM)',
-    recovery: '☁️ Recovery',
-    natacion: '🌊 Aguas Abiertas',
-    suave:    '🌿 Activación Suave'
+    pierna:     '🦵 Pierna Hipertrofia',
+    doble:      '⚡ Día Doble (Pierna + Piscina)',
+    activacion: '🌿 Activación Ligera',
+    empuje:     '💪 Torso · Empuje (PM)',
+    recovery:   '☁️ Recovery',
+    natacion:   '🌊 Aguas Abiertas',
+    suave:      '🌿 Activación Suave'
   };
   const TYPE_COLORS = {
-    pierna: 'var(--orange)', doble: 'var(--aqua)', recovery: 'var(--purple)',
+    pierna: 'var(--orange)', doble: 'var(--aqua)', activacion: 'var(--green)',
+    empuje: 'var(--orange)', recovery: 'var(--purple)',
     natacion: 'var(--aqua)', suave: 'var(--green)'
   };
 
@@ -1167,8 +1172,8 @@ function renderNutritionContent(container) {
           <div class="meal-check-row" onclick="toggleMeal('whey_pm')" style="margin-top:8px">
             <div class="meal-check-box${wheyPmDone?' checked':''}">✓</div>
             <div>
-              <div style="font-family:var(--font-ui);font-size:13px;font-weight:700;color:var(--text)">Whey post PM gym · 1 scoop</div>
-              <div style="font-family:var(--font-body);font-size:11px;color:var(--text3)">Post gym, con agua</div>
+              <div style="font-family:var(--font-ui);font-size:13px;font-weight:700;color:var(--text)">Whey post PM · 1 scoop</div>
+              <div style="font-family:var(--font-body);font-size:11px;color:var(--text3)">Post entreno de la tarde/noche, con agua</div>
             </div>
           </div>` : ''}
         <div style="font-family:var(--font-body);font-size:11px;color:var(--text3);margin-top:8px;font-style:italic">${meals.whey_note}</div>
