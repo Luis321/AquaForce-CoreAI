@@ -1,5 +1,5 @@
 /* ================================================================
-   AquaForce Training v2 — app.js
+   AquaForce Training v3 — app.js
    AM/PM sessions · Gym · Pierna Hipertrofia · Meal Plan · SQLite
    ================================================================ */
 'use strict';
@@ -30,16 +30,33 @@ const DAILY_SCHEDULE = {
   1: { // Lunes
     label: 'Lunes',
     am: {
+      name: 'Activación Matutina',
+      type: 'home', location: 'Casa',
+      focus: 'Movilidad + activación ligera · Sin carga, solo despertar el cuerpo',
+      tags: ['recovery','core','natacion'], duration: '40 min', load: 'suave',
+      coach: 'Rutina de activación — sin carga, solo para despertar el cuerpo antes del trabajo. Hoy no se trata de esfuerzo, se trata de consistencia.',
+      exercises: [
+        {id:'gato-vaca',    name:'Gato-Vaca',                       sets:2, reps:10,  duration:null,  rest:30, note:'Activa la columna. Inhala al bajar, exhala al subir.'},
+        {id:'kegel',        name:'Kegel',                           sets:1, reps:12,  duration:null,  rest:20, note:'Core profundo para empezar el día.'},
+        {id:'flow-am',      name:'Flow: side kick + crawl + hip twist + push-up', sets:2, reps:5, duration:null, rest:45, note:'Activación completa. Fluido, sin pausas entre los 4 movimientos.'},
+        {id:'flutter',      name:'Flutter kicks',                   sets:3, reps:null, duration:'40s', rest:45, note:'Simula la patada de crol. Espalda baja pegada al suelo.'}
+      ]
+    },
+    pm: null
+  },
+  2: { // Martes
+    label: 'Martes',
+    am: {
       name: 'Pierna Hipertrofia',
       type: 'home', location: 'Casa',
       focus: 'Fuerza de piernas para patada + volumen muscular',
-      tags: ['pierna','core','natacion'], duration: '45 min', load: 'alta',
-      coach: 'El día más importante de la semana. Cada rep de sentadilla se convierte en potencia en el agua.',
+      tags: ['pierna','core','natacion'], duration: '70 min', load: 'alta',
+      coach: 'El día más importante de la semana. Cada rep de sentadilla se convierte en potencia en el agua — esta noche lo compruebas en la piscina.',
       exercises: [
         {id:'gato-vaca',    name:'Gato-Vaca',                       sets:2, reps:10,  duration:null,  rest:30,  note:'Activa la columna. Inhala al bajar, exhala al subir.'},
         {id:'kegel',        name:'Kegel',                           sets:1, reps:12,  duration:null,  rest:20,  note:'Core profundo antes de las cargas pesadas.'},
         {id:'flow-am',      name:'Flow: side kick + crawl + hip twist + push-up', sets:2, reps:5, duration:null, rest:45, note:'Activación completa. Fluido, sin pausas entre los 4 movimientos.'},
-        {id:'sentadilla',   name:'Sentadilla con barra',            sets:4, reps:8,   duration:null,  rest:90,  note:'Tempo 3-1-1. Baja en 3 seg, pausa 1 seg, sube 1 seg. Rodillas siguen pies.', tempo:'3-1-1', isMain:true},
+        {id:'sentadilla',   name:'Sentadilla con barra',            sets:4, reps:8,   duration:null,  rest:90,  note:'Tempo 3-1-1. Baja en 3 seg, pausa 1 seg, sube 1 seg explotando. Barra a 15 kg. Rodillas siguen la línea de los pies.', tempo:'3-1-1', isMain:true},
         {id:'zancada-b',    name:'Zancada trasera con barra',       sets:4, reps:10,  duration:null,  rest:75,  note:'10 reps por pierna. Rodilla trasera toca suelo. Torso erecto.', isMain:true},
         {id:'step-up',      name:'Step-up con mancuernas',          sets:3, reps:12,  duration:null,  rest:60,  note:'12 reps por pierna. Empuja desde el pie de arriba. Sin impulso abajo.', isMain:true},
         {id:'sq-sumo',      name:'Sentadilla sumo con mancuerna',   sets:3, reps:15,  duration:null,  rest:60,  note:'Pies más abiertos. Activa aductores y glúteo.'},
@@ -48,59 +65,37 @@ const DAILY_SCHEDULE = {
         {id:'flutter',      name:'Flutter kicks',                   sets:3, reps:null, duration:'40s', rest:45, note:'Simula la patada de crol. Espalda baja pegada al suelo.'}
       ]
     },
-    pm: null, pmNote: '📚 Clases 7–11pm'
-  },
-  2: { // Martes
-    label: 'Martes',
-    am: {
-      name: 'Funcional + Torso',
-      type: 'home', location: 'Casa',
-      focus: 'Estabilidad de hombros · Control motor · Transferencia al agua',
-      tags: ['funcional','estabilidad','barra','natacion'], duration: '22 min', load: 'suave',
-      coach: 'Hoy es calidad, no cantidad. El serrato que trabajas hoy se transfiere directo al press militar del gym esta tarde.',
-      exercises: [
-        {id:'gato-vaca',    name:'Gato-Vaca',                       sets:2, reps:8,   duration:null,  rest:30, note:'Movilización matutina de columna.'},
-        {id:'kegel',        name:'Kegel',                           sets:1, reps:10,  duration:null,  rest:20, note:'Activa el suelo pélvico antes de empezar.'},
-        {id:'flow-am',      name:'Flow completo',                   sets:2, reps:5,   duration:null,  rest:45, note:'Ritmo fluido. Conecta con la respiración.'},
-        {id:'halo',         name:'Halo con mancuerna',              sets:3, reps:10,  duration:null,  rest:45, note:'Movimiento lento y controlado. Activa serrato y deltoides.'},
-        {id:'plank-sh',     name:'Plank shoulder taps',             sets:3, reps:12,  duration:null,  rest:45, note:'Cadera firme. No rotes el torso al levantar la mano.'},
-        {id:'serrato-b',    name:'Serrato en barra',                sets:3, reps:8,   duration:null,  rest:60, note:'Protracción de escápulas al final. Clave para la brazada.'},
-        {id:'pushup-b',     name:'Push-up en barra',                sets:2, reps:8,   duration:null,  rest:60, note:'Bajada lenta 3 seg. Codos a 45°. Protracción al subir.'}
-      ]
-    },
     pm: {
-      name: 'Gym — Empuje + Hombros',
-      type: 'gym', location: 'Gym',
-      focus: 'Volumen en hombros y pecho · Física de playa',
-      tags: ['gym','estabilidad'], duration: '50 min', load: 'alta',
-      coach: 'Tarde de gym. Empuje pesado. Hombros anchos son lo que más se nota sin camiseta.',
+      name: 'Piscina — Técnica y Resistencia',
+      type: 'swim', location: 'Piscina',
+      focus: 'Técnica de nado · Resistencia aeróbica · Series',
+      tags: ['natacion'], duration: '90 min', load: 'moderada',
+      coach: 'Piernas cargadas desde la mañana. Ahora conviértelas en propulsión: técnica antes que velocidad.',
       exercises: [
-        {id:'press-banca',  name:'Press banca con barra',           sets:4, reps:8,   duration:null,  rest:75, note:'Codos a 45°. Toca el pecho. Explota al subir.', isMain:true},
-        {id:'press-mil',    name:'Press militar',                   sets:3, reps:10,  duration:null,  rest:60, note:'De pie o sentado. Barra pasa por delante de la cara. Core activo.', isMain:true},
-        {id:'elev-lat',     name:'Elevaciones laterales',           sets:3, reps:15,  duration:null,  rest:45, note:'Pesos moderados. Codos levemente flexionados. Sin impulso.'},
-        {id:'fondos',       name:'Fondos en paralelas',             sets:3, reps:10,  duration:null,  rest:60, note:'Inclínate ligeramente adelante para activar más pecho.'},
-        {id:'face-pull',    name:'Face pull en polea',              sets:3, reps:15,  duration:null,  rest:45, note:'Polea alta, jala hacia la cara. Protege los hombros.'}
+        {id:'pool-warmup',  name:'Entrada y calentamiento',         sets:1, reps:null, duration:'10 min', rest:60, note:'Nado suave mixto. Aclimata el cuerpo después de la pierna de la mañana.'},
+        {id:'pool-drill',   name:'Drills de técnica',               sets:4, reps:null, duration:'50 m',   rest:30, note:'Catch-up, dedos al costado, respiración bilateral. Calidad sobre velocidad.'},
+        {id:'pool-main',    name:'Serie principal aeróbica',        sets:6, reps:null, duration:'100 m',  rest:45, note:'Ritmo constante. Las piernas se sienten pesadas — controla la patada.'},
+        {id:'pool-kick',    name:'Patada final',                    sets:4, reps:null, duration:'25 m',   rest:60, note:'Solo piernas con tabla. Convierte la fuerza de la mañana en propulsión.'},
+        {id:'pool-cooldown',name:'Vuelta a la calma',                sets:1, reps:null, duration:'5 min',  rest:0,  note:'Nado suave, respiración lenta. Estira en el borde.'}
       ]
     }
   },
   3: { // Miércoles
     label: 'Miércoles',
     am: {
-      name: 'Recovery Activo',
+      name: 'Activación Matutina',
       type: 'home', location: 'Casa',
-      focus: 'Movilidad · Core suave · Recuperación sin perder el hábito',
-      tags: ['recovery','core','estabilidad'], duration: '18 min', load: 'suave',
-      coach: 'Hoy no es día off — es día de escuchar al cuerpo. Esta sesión es lo que separa a los atletas de los aficionados.',
+      focus: 'Movilidad + activación ligera · Sin carga, solo despertar el cuerpo',
+      tags: ['recovery','core','natacion'], duration: '40 min', load: 'suave',
+      coach: 'Segunda sesión de activación de la semana. Después de la pierna del martes, hoy el cuerpo solo necesita movimiento suave.',
       exercises: [
-        {id:'gato-vaca',    name:'Gato-Vaca',                       sets:3, reps:10,  duration:null,   rest:20, note:'Más series hoy. Foco en movilidad y respiración.'},
-        {id:'kegel',        name:'Kegel',                           sets:2, reps:15,  duration:null,   rest:20, note:'Control consciente del suelo pélvico.'},
-        {id:'flow-suave',   name:'Flow suave',                      sets:2, reps:4,   duration:null,   rest:30, note:'Sin explosividad. Movimiento fluido y consciente.'},
-        {id:'plank-light',  name:'Plancha ligera',                  sets:2, reps:null, duration:'20s', rest:40, note:'No forzar. Solo activar.'},
-        {id:'serrato-s',    name:'Serrato suave en barra',          sets:2, reps:6,   duration:null,   rest:45, note:'Sin carga, solo movimiento de escápulas.'},
-        {id:'flutter-s',    name:'Flutter kicks suave',             sets:2, reps:null, duration:'20s', rest:40, note:'Solo para activar caderas. No hay fatiga.'}
+        {id:'gato-vaca',    name:'Gato-Vaca',                       sets:2, reps:10,  duration:null,  rest:30, note:'Activa la columna. Inhala al bajar, exhala al subir.'},
+        {id:'kegel',        name:'Kegel',                           sets:1, reps:12,  duration:null,  rest:20, note:'Core profundo para empezar el día.'},
+        {id:'flow-am',      name:'Flow: side kick + crawl + hip twist + push-up', sets:2, reps:5, duration:null, rest:45, note:'Activación completa. Fluido, sin pausas entre los 4 movimientos.'},
+        {id:'flutter',      name:'Flutter kicks',                   sets:3, reps:null, duration:'40s', rest:45, note:'Simula la patada de crol. Espalda baja pegada al suelo.'}
       ]
     },
-    pm: null, pmNote: '✅ Descanso — el cuerpo recupera el martes doble'
+    pm: null
   },
   4: { // Jueves
     label: 'Jueves',
@@ -108,13 +103,13 @@ const DAILY_SCHEDULE = {
       name: 'Pierna Hipertrofia',
       type: 'home', location: 'Casa',
       focus: 'Segunda sesión de pierna · Progresión de carga semanal',
-      tags: ['pierna','core','natacion'], duration: '45 min', load: 'alta',
-      coach: 'Segunda pierna de la semana. Si el lunes fue bueno, hoy sube 2.5 kg en sentadilla.',
+      tags: ['pierna','core','natacion'], duration: '70 min', load: 'alta',
+      coach: 'Segunda pierna de la semana. Si el martes fue bueno, hoy sube 2.5 kg en sentadilla.',
       exercises: [
         {id:'gato-vaca',    name:'Gato-Vaca',                       sets:2, reps:10,  duration:null,  rest:30,  note:'Activa la columna antes del trabajo fuerte.'},
         {id:'kegel',        name:'Kegel',                           sets:1, reps:12,  duration:null,  rest:20,  note:'Core profundo antes de las cargas.'},
-        {id:'flow-am',      name:'Flow completo',                   sets:3, reps:5,   duration:null,  rest:45,  note:'3 rondas hoy. Prepara todo el cuerpo.'},
-        {id:'sentadilla',   name:'Sentadilla con barra',            sets:4, reps:8,   duration:null,  rest:90,  note:'Mismo peso que lunes o +2.5 kg si completaste todas las reps.', tempo:'3-1-1', isMain:true},
+        {id:'flow-am',      name:'Flow: side kick + crawl + hip twist + push-up', sets:2, reps:5, duration:null, rest:45, note:'Activación completa. Fluido, sin pausas entre los 4 movimientos.'},
+        {id:'sentadilla',   name:'Sentadilla con barra',            sets:4, reps:8,   duration:null,  rest:90,  note:'Mismo peso que el martes o +2.5 kg si completaste todas las reps. Tempo 3-1-1.', tempo:'3-1-1', isMain:true},
         {id:'zancada-b',    name:'Zancada trasera con barra',       sets:4, reps:10,  duration:null,  rest:75,  note:'10 reps por pierna. Controla la bajada.', isMain:true},
         {id:'step-up',      name:'Step-up con mancuernas',          sets:3, reps:12,  duration:null,  rest:60,  note:'12 reps por pierna. Progresa en peso si puedes.', isMain:true},
         {id:'sq-sumo',      name:'Sentadilla sumo',                 sets:3, reps:15,  duration:null,  rest:60,  note:'Aductores y glúteo. Peso moderado, recorrido completo.'},
@@ -123,52 +118,52 @@ const DAILY_SCHEDULE = {
         {id:'flutter',      name:'Flutter kicks',                   sets:3, reps:null, duration:'40s', rest:45, note:'Termina siempre con el patrón de patada.'}
       ]
     },
-    pm: null, pmNote: '📚 Clases 7–11pm'
+    pm: {
+      name: 'Piscina — Técnica y Resistencia',
+      type: 'swim', location: 'Piscina',
+      focus: 'Técnica de nado · Resistencia aeróbica · Series',
+      tags: ['natacion'], duration: '90 min', load: 'moderada',
+      coach: 'Última sesión fuerte de la semana. Nada con las piernas cansadas — así se construye resistencia real.',
+      exercises: [
+        {id:'pool-warmup',  name:'Entrada y calentamiento',         sets:1, reps:null, duration:'10 min', rest:60, note:'Nado suave mixto. Aclimata el cuerpo después de la pierna de la mañana.'},
+        {id:'pool-drill',   name:'Drills de técnica',               sets:4, reps:null, duration:'50 m',   rest:30, note:'Catch-up, dedos al costado, respiración bilateral. Calidad sobre velocidad.'},
+        {id:'pool-main',    name:'Serie principal aeróbica',        sets:6, reps:null, duration:'100 m',  rest:45, note:'Ritmo constante. Las piernas se sienten pesadas — controla la patada.'},
+        {id:'pool-kick',    name:'Patada final',                    sets:4, reps:null, duration:'25 m',   rest:60, note:'Solo piernas con tabla. Convierte la fuerza de la mañana en propulsión.'},
+        {id:'pool-cooldown',name:'Vuelta a la calma',                sets:1, reps:null, duration:'5 min',  rest:0,  note:'Nado suave, respiración lenta. Estira en el borde.'}
+      ]
+    }
   },
   5: { // Viernes
     label: 'Viernes',
     am: {
-      name: 'Funcional + Core + Barra',
-      type: 'home', location: 'Casa',
-      focus: 'Control total · Hombros · Core · Barra',
-      tags: ['funcional','core','estabilidad','barra'], duration: '30 min', load: 'moderada',
-      coach: 'El viernes es tu sesión más completa. Cierra la semana fuerte — esta tarde hay gym.',
+      name: 'Torso · Empuje',
+      type: 'gym', location: 'Gym',
+      focus: 'Pecho · Hombros · Tríceps · Físico de playa (después de las 6pm)',
+      tags: ['gym','estabilidad'], duration: '70 min', load: 'alta',
+      coach: 'Nueva rutina de torso y empuje, después de las 6pm. Si la semana fue muy exigente, cambia esta sesión por natación suave — escucha al cuerpo.',
       exercises: [
-        {id:'gato-vaca',    name:'Gato-Vaca',                       sets:2, reps:10,  duration:null,  rest:30, note:'Siempre el primer paso.'},
-        {id:'kegel',        name:'Kegel',                           sets:1, reps:15,  duration:null,  rest:20, note:'Core profundo activo.'},
-        {id:'flow-am',      name:'Flow completo',                   sets:3, reps:5,   duration:null,  rest:45, note:'El flow más completo de la semana.'},
-        {id:'halo',         name:'Halo con mancuerna',              sets:3, reps:12,  duration:null,  rest:45, note:'Hoy más reps. Foco en hombros y serrato.'},
-        {id:'plank-sh',     name:'Plank shoulder taps',             sets:3, reps:16,  duration:null,  rest:45, note:'Estabilidad lumbar máxima.'},
-        {id:'pushup-b',     name:'Push-up en barra',                sets:3, reps:10,  duration:null,  rest:60, note:'Bajada controlada. Protracción al final.'},
-        {id:'elev-piernas', name:'Elevaciones de piernas en barra', sets:3, reps:10,  duration:null,  rest:60, note:'Core + cadera. Imita la patada vertical.'},
-        {id:'serrato-b',    name:'Serrato en barra',                sets:3, reps:10,  duration:null,  rest:60, note:'Escápulas activas. Clave para la brazada larga.'},
-        {id:'flutter',      name:'Flutter kicks',                   sets:3, reps:null, duration:'30s', rest:45, note:'Cierra la semana con el patrón de patada.'},
-        {id:'biceps-opt',   name:'Bíceps o trapecio (opcional)',    sets:2, reps:12,  duration:null,  rest:60, note:'Solo si la semana fue bien. No es obligatorio.'}
+        {id:'hombro-circ',   name:'Círculos de hombro + rotación externa', sets:2, reps:10,  duration:null,  rest:20, note:'10 reps por lado. Movilidad completa antes de cargar.'},
+        {id:'pushup-lento',  name:'Push-up lento sin peso',           sets:1, reps:8,   duration:null,  rest:30, note:'Bajada de 3-4 seg. Activa pecho y tríceps antes del press.'},
+        {id:'press-banca-db',name:'Press banca con mancuernas (banco plano, sin rack)', sets:4, reps:8, duration:null, rest:90, note:'Tempo 3-1-1: baja 3 seg, pausa 1 seg, sube 1 seg explotando.', tempo:'3-1-1', isMain:true},
+        {id:'press-mil-b',   name:'Press militar de pie con barra (clean desde el suelo)', sets:3, reps:10, duration:null, rest:75, note:'Clean la barra desde el suelo a los hombros, luego prensa. Core apretado.'},
+        {id:'aperturas-db',  name:'Aperturas con mancuerna (banco plano)', sets:3, reps:12, duration:null, rest:75, note:'Codos con leve flexión fija. Baja hasta sentir estiramiento en el pecho.'},
+        {id:'elev-lat-db',   name:'Elevaciones laterales con mancuerna', sets:3, reps:15,  duration:null,  rest:45, note:'Pesos moderados. Codos levemente flexionados. Sin impulso.'},
+        {id:'fondos-banco',  name:'Fondos en banco',                 sets:3, reps:12,  duration:null,  rest:60, note:'Manos en el borde del banco. Baja hasta 90° en el codo.'},
+        {id:'ext-triceps-db',name:'Extensión de tríceps con mancuerna', sets:3, reps:12, duration:null, rest:45, note:'Codos fijos junto a la cabeza. Baja controlado detrás de la nuca.'},
+        {id:'face-pull-db',  name:'Face pull con mancuerna de pie (bisagra de cadera)', sets:3, reps:15, duration:null, rest:45, note:'Bisagra de cadera, jala hacia la cara separando las manos. Protege el hombro.'},
+        {id:'kb-swing',      name:'Kettlebell swing',                sets:3, reps:15,  duration:null,  rest:60, note:'Empuje de cadera, no sentadilla. Core apretado, brazos relajados.'}
       ]
     },
-    pm: {
-      name: 'Gym — Espalda + Tracción',
-      type: 'gym', location: 'Gym',
-      focus: 'Forma en V · Espalda ancha · Bíceps',
-      tags: ['gym','barra'], duration: '50 min', load: 'alta',
-      coach: 'Jalón, remo, dominadas. La espalda en V es lo que define el cuerpo de un nadador.',
-      exercises: [
-        {id:'jalon',        name:'Jalón al pecho agarre ancho',     sets:4, reps:10,  duration:null,  rest:75, note:'Agarre más ancho que hombros. Baja a la clavícula. Escápulas abajo.', isMain:true},
-        {id:'remo-pol',     name:'Remo en polea sentado',           sets:3, reps:12,  duration:null,  rest:60, note:'Jala hacia el ombligo. Mantén la espalda erguida.', isMain:true},
-        {id:'dominadas',    name:'Dominadas asistidas o libres',    sets:3, reps:8,   duration:null,  rest:75, note:'Si no llegas a 8 libres, usa la máquina de asistencia.', isMain:true},
-        {id:'curl-alt',     name:'Curl bíceps alterno',             sets:3, reps:12,  duration:null,  rest:45, note:'Supinación completa al subir. Codo fijo.'},
-        {id:'shrug',        name:'Encogimientos de trapecio',       sets:2, reps:15,  duration:null,  rest:45, note:'Sube los hombros directo hacia las orejas. Sin rotar.'}
-      ]
-    }
+    pm: null, pmNote: '✅ Sesión única después de las 6pm · Alternativa: natación suave'
   },
   6: { // Sábado
     label: 'Sábado',
     am: {
-      name: 'Activación Suave',
+      name: 'Activación Suave (opcional)',
       type: 'home', location: 'Casa',
-      focus: 'Movilidad + activación ligera · Prepara para mañana en el agua',
-      tags: ['recovery','estabilidad'], duration: '15 min', load: 'suave',
-      coach: 'Sábado es para moverte sin esforzarte. Esta sesión te mantiene activo y te prepara para el domingo en el agua.',
+      focus: 'Movilidad + activación ligera · Descanso o movilidad opcional',
+      tags: ['recovery','estabilidad'], duration: '15–20 min', load: 'suave',
+      coach: 'Sábado es descanso. Si tienes energía, aprovecha el hueco de clases de 15 a 18h para 15-20 min de movilidad suave — nunca es obligatorio.',
       exercises: [
         {id:'gato-vaca',    name:'Gato-Vaca',                       sets:3, reps:10,  duration:null,   rest:20, note:'El más importante del día. Abre la columna.'},
         {id:'kegel',        name:'Kegel',                           sets:2, reps:12,  duration:null,   rest:20, note:'Core profundo, incluso en días suaves.'},
@@ -178,7 +173,7 @@ const DAILY_SCHEDULE = {
         {id:'flutter-s',    name:'Flutter kicks suave',             sets:2, reps:null, duration:'15s', rest:30, note:'Solo para recordar el patrón antes de nadar mañana.'}
       ]
     },
-    pm: null, pmNote: '📚 Clases 2–6pm'
+    pm: null, pmNote: '📚 Clases · Movilidad opcional en el hueco 15–18h'
   }
 };
 
@@ -186,66 +181,66 @@ const DAILY_SCHEDULE = {
 // 2. MEAL PLAN DIARIO (del Excel)
 // ════════════════════════════════════════════════════════════════
 const MEAL_PLAN = {
-  1: { // Lunes — Pierna hipertrofia
-    kcal: 1650, type: 'pierna',
-    whey: ['post_am'],
-    whey_note: '1 scoop con agua — inmediatamente post-pierna AM',
-    adjustment: '+1 plátano pre-entreno · +30g avena extra en desayuno',
-    desayuno: '🥞 Panqueque de avena (3 cdas avena + 3 claras + ½ plátano + 1½ cdta mantequilla de maní + 1 cda linaza molida) + 150 ml kéfir\n+ 1 plátano extra PRE-ENTRENO · +30g avena',
-    almuerzo: '150 g pollo + 1 papa + ensalada brócoli + 1 cdta aceite + 6 aceitunas',
-    snack: '1 manzana + 10 almendras',
-    cena: '🥞 Panqueque (3 claras + avena + 1 cda mantequilla de maní + 1 cdta semillas de girasol)',
-    prot: 170
+  1: { // Lunes — Activación ligera, sin carga
+    kcal: 1400, type: 'activacion',
+    whey: [],
+    whey_note: 'Sin whey hoy — día de activación sin carga',
+    adjustment: 'Día de mantenimiento. Sin plátano extra pre-entreno — la sesión de hoy no lleva carga externa.',
+    desayuno: '🥣 Avena cocida + ½ tz arándanos + 1 cdta mantequilla de maní + 1 cdta chía + 100 ml kéfir + 3 claras',
+    almuerzo: '150 g pollo a la plancha + ½ tz quinua + ensalada cocida + 1 cdta aceite',
+    snack: '1 manzana + 8 almendras',
+    cena: '🍳 Omelette (3 claras) + ½ tz zapallito + 1 cdta semillas de girasol',
+    prot: 160
   },
-  2: { // Martes — Doble sesión
+  2: { // Martes — Pierna + Piscina (día de mayor carga)
     kcal: 1700, type: 'doble',
     whey: ['post_am', 'post_pm'],
-    whey_note: '2 scoops hoy: post AM (casa) y post PM (gym)',
-    adjustment: '+yogurt griego post-gym · +½ plátano post-AM',
-    desayuno: '🥣 Avena cocida + ¾ tz arándanos + 1½ cdta mantequilla de maní + 1 cdta chía + 1 cda linaza molida + 150 ml kéfir + 3 claras',
+    whey_note: '2 scoops hoy: post-pierna (AM) y post-piscina (PM)',
+    adjustment: '+1 plátano pre-entreno AM · +yogurt griego post-piscina',
+    desayuno: '🥣 Avena cocida + ¾ tz arándanos + 1½ cdta mantequilla de maní + 1 cdta chía + 1 cda linaza molida + 150 ml kéfir + 3 claras\n+ 1 plátano extra PRE-ENTRENO',
     almuerzo: '150 g pollo a la plancha + ½ tz quinua + ensalada cocida + 1 cdta aceite',
     snack: '½ plátano + 10 maníes',
-    cena: '2 huevos sancochados + ½ tz zapallito + 20 g palta + 1 cdta semillas de girasol\n+ Yogurt griego 170g POST-GYM',
+    cena: '2 huevos sancochados + ½ tz zapallito + 20 g palta + 1 cdta semillas de girasol\n+ Yogurt griego 170g POST-PISCINA',
     prot: 175
   },
-  3: { // Miércoles — Recovery
-    kcal: 1400, type: 'recovery',
+  3: { // Miércoles — Activación ligera, sin carga
+    kcal: 1400, type: 'activacion',
     whey: [],
-    whey_note: 'Sin whey hoy — día de recuperación',
-    adjustment: 'Plan base exacto. Reduce carbos en cena si no entrenaste fuerte.',
+    whey_note: 'Sin whey hoy — día de activación sin carga',
+    adjustment: 'Plan base de mantenimiento. Segunda sesión de activación de la semana, después de la pierna del martes.',
     desayuno: '½ plátano + 3 claras + 30 g pollo + espinaca + 1 salmas + 30 g palta + 1 cdta chía + 100 ml kéfir + 1 cda semillas de girasol',
     almuerzo: '150 g carne magra + 1 papa blanca + ensalada cocida + 1 cdta aceite + 6 aceitunas',
     snack: '1 pera + 6 almendras',
     cena: '🥞 Panqueque de avena (3 claras + ½ manzana + 1 cdta mantequilla de maní + 1 cdta linaza molida)',
     prot: 160
   },
-  4: { // Jueves — Pierna hipertrofia
-    kcal: 1650, type: 'pierna',
-    whey: ['post_am'],
-    whey_note: '1 scoop con agua — post-pierna AM',
-    adjustment: '+1 plátano pre-entreno · +30g avena extra',
-    desayuno: '🥞 Panqueque de avena (3 claras + ½ manzana + 1½ cdta mantequilla de maní + 1 cdta chía + 1 cda semillas de girasol) + 150 ml kéfir + ½ tz fresas\n+ 1 plátano PRE-ENTRENO',
-    almuerzo: '150 g pollo deshilachado + 70 g fideos integrales + ensalada tomate/espinaca + 1 cdta aceite',
-    snack: '1 manzana + 10 maníes',
-    cena: '1 huevo sancochado + 1 salmas + ensalada verde + 25 g palta + 1 cdta linaza molida',
-    prot: 170
-  },
-  5: { // Viernes — Doble sesión
+  4: { // Jueves — Pierna + Piscina (sube carga vs martes)
     kcal: 1700, type: 'doble',
     whey: ['post_am', 'post_pm'],
-    whey_note: '2 scoops: post AM (casa) y post PM (gym)',
-    adjustment: '+yogurt griego post-gym',
-    desayuno: '½ plátano + 3 claras + 30 g pollo + espinaca + 1 salmas + 30 g palta + 1 cdta chía + 150 ml kéfir + 1 cda semillas de girasol',
-    almuerzo: '150 g pollo a la plancha + ½ tz arroz integral + ensalada brócoli + 1 cdta aceite + 6 aceitunas',
-    snack: '1 manzana + 8 almendras',
-    cena: '🥞 Panqueque (3 claras + avena + 1 cda mantequilla de maní + 1 cdta linaza molida)\n+ Yogurt griego 170g POST-GYM',
+    whey_note: '2 scoops hoy: post-pierna (AM, carga más alta que el martes) y post-piscina (PM)',
+    adjustment: '+1 plátano pre-entreno AM · +30g avena extra · +yogurt griego post-piscina',
+    desayuno: '🥞 Panqueque de avena (3 claras + ½ manzana + 1½ cdta mantequilla de maní + 1 cdta chía + 1 cda semillas de girasol) + 150 ml kéfir + ½ tz fresas\n+ 1 plátano PRE-ENTRENO · +30g avena extra',
+    almuerzo: '150 g pollo deshilachado + 70 g fideos integrales + ensalada tomate/espinaca + 1 cdta aceite',
+    snack: '1 manzana + 10 maníes',
+    cena: '1 huevo sancochado + 1 salmas + ensalada verde + 25 g palta + 1 cdta linaza molida\n+ Yogurt griego 170g POST-PISCINA',
     prot: 175
   },
-  6: { // Sábado — Activación suave
+  5: { // Viernes — Torso · Empuje (después de las 6pm)
+    kcal: 1600, type: 'empuje',
+    whey: ['post_pm'],
+    whey_note: '1 scoop post-entreno — al terminar Torso/Empuje después de las 6pm',
+    adjustment: 'Sin carga extra en el desayuno — el entrenamiento es en la noche. Snack ligero antes de la sesión si llegas con hambre.',
+    desayuno: '½ plátano + 3 claras + 30 g pollo + espinaca + 1 salmas + 30 g palta + 1 cdta chía + 150 ml kéfir + 1 cda semillas de girasol',
+    almuerzo: '150 g pollo a la plancha + ½ tz arroz integral + ensalada brócoli + 1 cdta aceite + 6 aceitunas',
+    snack: '1 manzana + 8 almendras · +½ plátano si entrenas después de las 6pm con hambre',
+    cena: '🥞 Panqueque (3 claras + avena + 1 cda mantequilla de maní + 1 cdta linaza molida)\n+ Yogurt griego 170g POST-ENTRENO (Torso/Empuje)',
+    prot: 165
+  },
+  6: { // Sábado — Descanso / movilidad opcional (mantenimiento)
     kcal: 1400, type: 'suave',
     whey: [],
     whey_note: 'Sin whey hoy',
-    adjustment: 'Plan base. Duerme bien esta noche — mañana es aguas abiertas.',
+    adjustment: 'Plan base de mantenimiento. Movilidad opcional en el hueco 15–18h no cambia el plan. Duerme bien — mañana es aguas abiertas.',
     desayuno: '🥣 Avena cocida + ½ tz fresas + 1½ cdta mantequilla de maní + 1 cdta chía + 150 ml kéfir + 1 cda linaza molida + 3 claras',
     almuerzo: '150 g pollo a la plancha + ½ tz quinua + ensalada cocida + 1 cda palta + 1 cdta aceite',
     snack: '1 pera + 10 maníes',
@@ -836,10 +831,12 @@ function getRecommendations() {
   const streak = getStreak();
   const dow = APP.currentDayOfWeek;
   if (streak > 7) recs.push('Llevas '+streak+' días seguidos. Asegúrate de dormir 7h+ los días sin clase.');
-  if (stats.completed >= 5) recs.push('Esta semana sube 2.5 kg en sentadilla si completaste todas las reps el lunes y jueves.');
-  if (dow === 1 || dow === 4) recs.push('Día de pierna: come el desayuno reforzado antes de entrenar y toma el whey inmediatamente después.');
-  if (dow === 2 || dow === 5) recs.push('Día doble: recuerda el segundo scoop de whey post-gym en la tarde.');
-  if (dow === 3) recs.push('Recovery activo hoy. No te lo saltes — es parte del plan.');
+  if (stats.completed >= 5) recs.push('Esta semana sube 2.5 kg en sentadilla si completaste todas las reps el martes y jueves.');
+  if (dow === 2 || dow === 4) recs.push('Día de pierna + piscina: desayuno reforzado antes de la sentadilla y whey post-entreno en ambos bloques (AM fuerza y PM piscina).');
+  if (dow === 1 || dow === 3) recs.push('Activación ligera hoy, sin carga. Día de mantenimiento — reduce carbohidratos frente a los días de pierna.');
+  if (dow === 5) recs.push('Torso/Empuje después de las 6pm: ventana de proteína post-entreno al terminar la sesión.');
+  if (dow === 6) recs.push('Descanso o movilidad opcional hoy. Día de mantenimiento.');
+  if (dow === 0) recs.push('Aguas abiertas: día de entrenamiento largo. Mantén carbohidratos altos y whey post-natación.');
   if (!recs.length) recs.push('Mantén el volumen. Estás en zona de adaptación óptima.');
   return recs;
 }
@@ -1109,14 +1106,17 @@ function renderNutritionContent(container) {
   }
 
   const TYPE_LABELS = {
-    pierna:   '🦵 Pierna Hipertrofia',
-    doble:    '⚡ Día Doble (AM + PM)',
-    recovery: '☁️ Recovery',
-    natacion: '🌊 Aguas Abiertas',
-    suave:    '🌿 Activación Suave'
+    pierna:     '🦵 Pierna Hipertrofia',
+    doble:      '⚡ Día Doble (Pierna + Piscina)',
+    activacion: '🌿 Activación Ligera',
+    empuje:     '💪 Torso · Empuje (PM)',
+    recovery:   '☁️ Recovery',
+    natacion:   '🌊 Aguas Abiertas',
+    suave:      '🌿 Activación Suave'
   };
   const TYPE_COLORS = {
-    pierna: 'var(--orange)', doble: 'var(--aqua)', recovery: 'var(--purple)',
+    pierna: 'var(--orange)', doble: 'var(--aqua)', activacion: 'var(--green)',
+    empuje: 'var(--orange)', recovery: 'var(--purple)',
     natacion: 'var(--aqua)', suave: 'var(--green)'
   };
 
@@ -1172,8 +1172,8 @@ function renderNutritionContent(container) {
           <div class="meal-check-row" onclick="toggleMeal('whey_pm')" style="margin-top:8px">
             <div class="meal-check-box${wheyPmDone?' checked':''}">✓</div>
             <div>
-              <div style="font-family:var(--font-ui);font-size:13px;font-weight:700;color:var(--text)">Whey post PM gym · 1 scoop</div>
-              <div style="font-family:var(--font-body);font-size:11px;color:var(--text3)">Post gym, con agua</div>
+              <div style="font-family:var(--font-ui);font-size:13px;font-weight:700;color:var(--text)">Whey post PM · 1 scoop</div>
+              <div style="font-family:var(--font-body);font-size:11px;color:var(--text3)">Post entreno de la tarde/noche, con agua</div>
             </div>
           </div>` : ''}
         <div style="font-family:var(--font-body);font-size:11px;color:var(--text3);margin-top:8px;font-style:italic">${meals.whey_note}</div>
