@@ -178,85 +178,71 @@ const DAILY_SCHEDULE = {
 };
 
 // ════════════════════════════════════════════════════════════════
-// 2. MEAL PLAN DIARIO (del Excel)
+// 2. MEAL PLAN DIARIO (revisado por nutricionista · insumos peruanos)
 // ════════════════════════════════════════════════════════════════
 const MEAL_PLAN = {
-  1: { // Lunes — Activación ligera, sin carga
-    kcal: 1400, type: 'activacion',
-    whey: [],
-    whey_note: 'Sin whey hoy — día de activación sin carga',
-    adjustment: 'Día de mantenimiento. Sin plátano extra pre-entreno — la sesión de hoy no lleva carga externa.',
-    desayuno: '🥣 Avena cocida + ½ tz arándanos + 1 cdta mantequilla de maní + 1 cdta chía + 100 ml kéfir + 3 claras',
-    almuerzo: '150 g pollo a la plancha + ½ tz quinua + ensalada cocida + 1 cdta aceite',
-    snack: '1 manzana + 8 almendras',
-    cena: '🍳 Omelette (3 claras) + ½ tz zapallito + 1 cdta semillas de girasol',
-    prot: 160
+  1: { // Lunes — Activación
+    kcal: 1898, type: 'activacion', prot: 174,
+    whey: ['post'], whey_note: '1 scoop post-entreno, al terminar la activación de la mañana.',
+    adjustment: 'Plan fijo ~1900 kcal — ya no baja en días de activación.',
+    desayuno: '3 huevos enteros + 3 claras + avena cocida (60g) + canela',
+    almuerzo: '180g tilapia a la plancha + 200g arroz integral + ensalada de brócoli + 1 cdta aceite de oliva + 30g palta',
+    post_entreno: 'Whey (30g) + plátano + avena (15g) + leche + canela',
+    cena: '150g pollo deshilachado + 100g arroz integral + ensalada verde + 25g palta + 150g yogur natural'
   },
-  2: { // Martes — Pierna + Piscina (día de mayor carga)
-    kcal: 1700, type: 'doble',
-    whey: ['post_am', 'post_pm'],
-    whey_note: '2 scoops hoy: post-pierna (AM) y post-piscina (PM)',
-    adjustment: '+1 plátano pre-entreno AM · +yogurt griego post-piscina',
-    desayuno: '🥣 Avena cocida + ¾ tz arándanos + 1½ cdta mantequilla de maní + 1 cdta chía + 1 cda linaza molida + 150 ml kéfir + 3 claras\n+ 1 plátano extra PRE-ENTRENO',
-    almuerzo: '150 g pollo a la plancha + ½ tz quinua + ensalada cocida + 1 cdta aceite',
-    snack: '½ plátano + 10 maníes',
-    cena: '2 huevos sancochados + ½ tz zapallito + 20 g palta + 1 cdta semillas de girasol\n+ Yogurt griego 170g POST-PISCINA',
-    prot: 175
+  2: { // Martes — Pierna + Piscina
+    kcal: 1902, type: 'doble', prot: 174,
+    whey: ['post'], whey_note: '1 scoop post-entreno — tómalo después de la piscina (PM), cubre ambas sesiones del día.',
+    adjustment: 'Un solo batido post-entreno para las dos sesiones (fuerza AM + piscina PM).',
+    desayuno: '3 huevos enteros + 3 claras + avena cocida (60g) + ¼ tz arándanos',
+    almuerzo: '180g jurel al horno + 200g camote sancochado + ensalada de espinaca + 1 cdta aceite + 30g palta',
+    post_entreno: 'Whey (30g) + papaya + yogur natural + leche',
+    cena: '150g tilapia al horno + 100g camote + ensalada de zapallito + 25g palta + 150g yogur natural'
   },
-  3: { // Miércoles — Activación ligera, sin carga
-    kcal: 1400, type: 'activacion',
-    whey: [],
-    whey_note: 'Sin whey hoy — día de activación sin carga',
-    adjustment: 'Plan base de mantenimiento. Segunda sesión de activación de la semana, después de la pierna del martes.',
-    desayuno: '½ plátano + 3 claras + 30 g pollo + espinaca + 1 salmas + 30 g palta + 1 cdta chía + 100 ml kéfir + 1 cda semillas de girasol',
-    almuerzo: '150 g carne magra + 1 papa blanca + ensalada cocida + 1 cdta aceite + 6 aceitunas',
-    snack: '1 pera + 6 almendras',
-    cena: '🥞 Panqueque de avena (3 claras + ½ manzana + 1 cdta mantequilla de maní + 1 cdta linaza molida)',
-    prot: 160
+  3: { // Miércoles — Activación
+    kcal: 1899, type: 'activacion', prot: 174,
+    whey: ['post'], whey_note: '1 scoop post-entreno, al terminar la activación de la mañana.',
+    adjustment: 'Plan fijo ~1900 kcal — ya no baja en días de activación.',
+    desayuno: '3 huevos enteros + 3 claras + avena cocida (60g) + ½ plátano',
+    almuerzo: '180g pollo a la plancha + 200g quinua cocida + ensalada de tomate/zapallito + 1 cdta aceite + 30g palta',
+    post_entreno: 'Whey (30g) + plátano + avena (15g) + leche + canela',
+    cena: '150g pollo a la plancha + 100g papa + ensalada de espinaca + 25g palta + 150g yogur natural'
   },
   4: { // Jueves — Pierna + Piscina (sube carga vs martes)
-    kcal: 1700, type: 'doble',
-    whey: ['post_am', 'post_pm'],
-    whey_note: '2 scoops hoy: post-pierna (AM, carga más alta que el martes) y post-piscina (PM)',
-    adjustment: '+1 plátano pre-entreno AM · +30g avena extra · +yogurt griego post-piscina',
-    desayuno: '🥞 Panqueque de avena (3 claras + ½ manzana + 1½ cdta mantequilla de maní + 1 cdta chía + 1 cda semillas de girasol) + 150 ml kéfir + ½ tz fresas\n+ 1 plátano PRE-ENTRENO · +30g avena extra',
-    almuerzo: '150 g pollo deshilachado + 70 g fideos integrales + ensalada tomate/espinaca + 1 cdta aceite',
-    snack: '1 manzana + 10 maníes',
-    cena: '1 huevo sancochado + 1 salmas + ensalada verde + 25 g palta + 1 cdta linaza molida\n+ Yogurt griego 170g POST-PISCINA',
-    prot: 175
+    kcal: 1904, type: 'doble', prot: 174,
+    whey: ['post'], whey_note: '1 scoop post-entreno — tómalo después de la piscina (PM), cubre ambas sesiones del día.',
+    adjustment: 'Un solo batido post-entreno para las dos sesiones. Día de mayor carga en pierna.',
+    desayuno: '3 huevos enteros + 3 claras + avena cocida (60g) + 1 cdta semillas de girasol',
+    almuerzo: '180g tilapia al horno + 200g papa sancochada + ensalada de brócoli + 1 cdta aceite + 30g palta',
+    post_entreno: 'Whey (30g) + maracuyá + plátano + avena (15g) + leche',
+    cena: '150g jurel al horno + 100g arroz integral + ensalada de brócoli + 25g palta + 150g yogur natural'
   },
-  5: { // Viernes — Torso · Empuje (después de las 6pm)
-    kcal: 1600, type: 'empuje',
-    whey: ['post_pm'],
-    whey_note: '1 scoop post-entreno — al terminar Torso/Empuje después de las 6pm',
-    adjustment: 'Sin carga extra en el desayuno — el entrenamiento es en la noche. Snack ligero antes de la sesión si llegas con hambre.',
-    desayuno: '½ plátano + 3 claras + 30 g pollo + espinaca + 1 salmas + 30 g palta + 1 cdta chía + 150 ml kéfir + 1 cda semillas de girasol',
-    almuerzo: '150 g pollo a la plancha + ½ tz arroz integral + ensalada brócoli + 1 cdta aceite + 6 aceitunas',
-    snack: '1 manzana + 8 almendras · +½ plátano si entrenas después de las 6pm con hambre',
-    cena: '🥞 Panqueque (3 claras + avena + 1 cda mantequilla de maní + 1 cdta linaza molida)\n+ Yogurt griego 170g POST-ENTRENO (Torso/Empuje)',
-    prot: 165
+  5: { // Viernes — Torso · Empuje (o natación alternativa)
+    kcal: 1900, type: 'empuje', prot: 174,
+    whey: ['post'], whey_note: '1 scoop post-entreno, al terminar Torso/Empuje después de las 6pm (o post-natación si eliges esa opción el viernes).',
+    adjustment: 'Entrenamiento en la noche — sin carga extra en el desayuno.',
+    desayuno: '3 huevos enteros + 3 claras + avena cocida (60g) + ¼ tz arándanos',
+    almuerzo: '180g caballa a la plancha + 200g arroz integral + ensalada de espinaca/zanahoria + 1 cdta aceite + 30g palta',
+    post_entreno: 'Whey (30g) + plátano + avena (15g) + leche + canela',
+    cena: '150g pollo deshilachado + 100g camote + ensalada de tomate + 25g palta + 150g yogur natural'
   },
-  6: { // Sábado — Descanso / movilidad opcional (mantenimiento)
-    kcal: 1400, type: 'suave',
-    whey: [],
-    whey_note: 'Sin whey hoy',
-    adjustment: 'Plan base de mantenimiento. Movilidad opcional en el hueco 15–18h no cambia el plan. Duerme bien — mañana es aguas abiertas.',
-    desayuno: '🥣 Avena cocida + ½ tz fresas + 1½ cdta mantequilla de maní + 1 cdta chía + 150 ml kéfir + 1 cda linaza molida + 3 claras',
-    almuerzo: '150 g pollo a la plancha + ½ tz quinua + ensalada cocida + 1 cda palta + 1 cdta aceite',
-    snack: '1 pera + 10 maníes',
-    cena: '🍳 Omelette (3 claras) + ½ tz zapallo italiano salteado + 1 cdta semillas de girasol',
-    prot: 160
+  6: { // Sábado — Descanso / movilidad opcional
+    kcal: 1901, type: 'suave', prot: 174,
+    whey: ['post'], whey_note: '1 scoop post-entreno o de mantenimiento.',
+    adjustment: 'Día de mantenimiento antes de aguas abiertas del domingo.',
+    desayuno: '3 huevos enteros + 3 claras + avena cocida (60g) + canela + ½ plátano',
+    almuerzo: '180g carne magra (res) a la plancha + 200g camote + ensalada mixta + 1 cdta aceite + 30g palta',
+    post_entreno: 'Whey (30g) + papaya + yogur natural + leche',
+    cena: '150g tilapia a la plancha + 100g quinua + ensalada mixta + 25g palta + 150g yogur natural'
   },
   0: { // Domingo — Aguas abiertas
-    kcal: 1550, type: 'natacion',
-    whey: ['post_am'],
-    whey_note: '1 scoop post-natación con agua',
-    adjustment: '+½ plátano pre-natación · Tupper 1 completo post-agua',
-    desayuno: '½ plátano + 3 claras + 30 g jamón del país + espinaca + 1 salmas + 40 g palta + 1 cdta chía + 100 ml kéfir + ½ tz fresas + 1 cda linaza molida\n+ ½ plátano extra PRE-NATACIÓN',
-    almuerzo: '150 g pollo a la plancha + 1 papa + ensalada cocida + 6 aceitunas + 1 cdta aceite',
-    snack: '1 naranja + 6 almendras',
-    cena: '1 huevo sancochado + ½ tz camote + ensalada verde + 1 cdta semillas de girasol',
-    prot: 165
+    kcal: 1897, type: 'natacion', prot: 174,
+    whey: ['post'], whey_note: '1 scoop post-entreno, después de aguas abiertas.',
+    adjustment: 'Agrega ½ plátano extra en el smoothie pre-entreno si sientes más hambre antes de nadar.',
+    desayuno: '3 huevos enteros + 3 claras + avena cocida (60g) + fresas picadas',
+    almuerzo: '180g tilapia a la plancha + 200g quinua + ensalada de tomate + 1 cdta aceite + 30g palta',
+    post_entreno: 'Whey (30g) + plátano + avena (15g) + leche + canela',
+    cena: '150g carne magra + 100g papa + ensalada verde + 25g palta + 150g yogur natural'
   }
 };
 
@@ -1106,25 +1092,23 @@ function renderNutritionContent(container) {
   }
 
   const TYPE_LABELS = {
-    pierna:     '🦵 Pierna Hipertrofia',
     doble:      '⚡ Día Doble (Pierna + Piscina)',
     activacion: '🌿 Activación Ligera',
     empuje:     '💪 Torso · Empuje (PM)',
-    recovery:   '☁️ Recovery',
     natacion:   '🌊 Aguas Abiertas',
     suave:      '🌿 Activación Suave'
   };
   const TYPE_COLORS = {
-    pierna: 'var(--orange)', doble: 'var(--aqua)', activacion: 'var(--green)',
-    empuje: 'var(--orange)', recovery: 'var(--purple)',
+    doble: 'var(--aqua)', activacion: 'var(--green)',
+    empuje: 'var(--orange)',
     natacion: 'var(--aqua)', suave: 'var(--green)'
   };
 
   const mealItems = [
-    { key: 'desayuno', icon: '🥣', label: 'Desayuno', sub: '≈420 kcal', content: meals.desayuno },
-    { key: 'almuerzo', icon: '🍱', label: 'Tupper 1 — Almuerzo', sub: '≈490 kcal', content: meals.almuerzo },
-    { key: 'snack',    icon: '🍎', label: 'Snack Tarde', sub: '≈210 kcal', content: meals.snack },
-    { key: 'cena',     icon: '🍽️', label: 'Cena', sub: '≈280 kcal', content: meals.cena }
+    { key: 'desayuno',     icon: '🥣', label: 'Desayuno',              sub: '≈420 kcal', content: meals.desayuno },
+    { key: 'almuerzo',     icon: '🍱', label: 'Tupper 1 — Almuerzo',   sub: '≈490 kcal', content: meals.almuerzo },
+    { key: 'post_entreno', icon: '🥤', label: 'Post-Entreno',          sub: '≈210 kcal', content: meals.post_entreno },
+    { key: 'cena',         icon: '🍽️', label: 'Cena',                  sub: '≈280 kcal', content: meals.cena }
   ];
 
   let html = `
@@ -1155,25 +1139,16 @@ function renderNutritionContent(container) {
 
   // Whey section
   if (meals.whey.length > 0) {
-    const wheyAmDone = mealLogs['whey_am'];
-    const wheyPmDone = mealLogs['whey_pm'];
+    const wheyPostDone = mealLogs['whey_post'];
     html += `
       <div style="background:rgba(11,255,240,.06);border:1px solid rgba(11,255,240,.2);border-radius:var(--r2);padding:14px;margin:0 0 14px">
         <div style="font-family:var(--font-ui);font-size:9px;font-weight:700;letter-spacing:2px;color:var(--aqua);text-transform:uppercase;margin-bottom:8px">🥤 WHEY HOY</div>
-        ${meals.whey.includes('post_am') ? `
-          <div class="meal-check-row" onclick="toggleMeal('whey_am')">
-            <div class="meal-check-box${wheyAmDone?' checked':''}">✓</div>
+        ${meals.whey.includes('post') ? `
+          <div class="meal-check-row" onclick="toggleMeal('whey_post')">
+            <div class="meal-check-box${wheyPostDone?' checked':''}">✓</div>
             <div>
-              <div style="font-family:var(--font-ui);font-size:13px;font-weight:700;color:var(--text)">Whey post AM · 1 scoop</div>
-              <div style="font-family:var(--font-body);font-size:11px;color:var(--text3)">Con agua, inmediatamente post-entreno</div>
-            </div>
-          </div>` : ''}
-        ${meals.whey.includes('post_pm') ? `
-          <div class="meal-check-row" onclick="toggleMeal('whey_pm')" style="margin-top:8px">
-            <div class="meal-check-box${wheyPmDone?' checked':''}">✓</div>
-            <div>
-              <div style="font-family:var(--font-ui);font-size:13px;font-weight:700;color:var(--text)">Whey post PM · 1 scoop</div>
-              <div style="font-family:var(--font-body);font-size:11px;color:var(--text3)">Post entreno de la tarde/noche, con agua</div>
+              <div style="font-family:var(--font-ui);font-size:13px;font-weight:700;color:var(--text)">Whey post-entreno · 1 scoop (30g)</div>
+              <div style="font-family:var(--font-body);font-size:11px;color:var(--text3)">Con agua o leche, inmediatamente post-entreno</div>
             </div>
           </div>` : ''}
         <div style="font-family:var(--font-body);font-size:11px;color:var(--text3);margin-top:8px;font-style:italic">${meals.whey_note}</div>
@@ -1631,7 +1606,7 @@ function renderDashboard() {
     const meals = getTodayMeals();
     if (meals) {
       const mealLogs = DB.getMealLogsForDate(getTodayKey());
-      const keys = ['desayuno','almuerzo','snack','cena',...meals.whey.map(w=>`whey_${w.split('_')[1]}`)];
+      const keys = ['desayuno','almuerzo','post_entreno','cena',...meals.whey.map(w=>`whey_${w}`)];
       const done = keys.filter(k => mealLogs[k]).length;
       setVal('dc-meal-pct', Math.round((done/keys.length)*100) + '%');
       setBar('dc-meal-bar', (done/keys.length)*100);
