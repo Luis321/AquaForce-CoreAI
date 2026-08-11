@@ -1329,6 +1329,18 @@ function updateTimerModal() {
   document.getElementById('modal-reps-val').textContent  = repStr;
   document.getElementById('modal-ex-progress').textContent = `${idx+1}/${exercises.length}`;
 
+  // Note info button & popup — update content and session color, hide popup on exercise change
+  const infoBtn   = document.getElementById('modal-ex-info-btn');
+  const notePopup = document.getElementById('modal-ex-note-popup');
+  const noteText  = document.getElementById('modal-ex-note-text');
+  const hasNote   = !!(ex.note && ex.note.trim());
+  if (infoBtn) {
+    infoBtn.style.display = hasNote ? '' : 'none';
+    infoBtn.className = `modal-ex-info-btn${type === 'pm' ? ' pm' : ''}`;
+  }
+  if (noteText)  noteText.textContent = ex.note || '';
+  if (notePopup) notePopup.className  = `modal-ex-note-popup hidden${type === 'pm' ? ' pm' : ''}`;
+
   // Session badge
   const sessEl = document.getElementById('modal-session-badge');
   if (sessEl) {
@@ -1865,6 +1877,26 @@ function bindEvents() {
   document.getElementById('modal-btn-rest')?.addEventListener('click', completeRest);
   document.getElementById('modal-btn-next-ex')?.addEventListener('click', nextExercise);
   document.getElementById('modal-btn-close')?.addEventListener('click', closeTimerModal);
+
+  // Exercise note popup toggle
+  document.getElementById('modal-ex-info-btn')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const popup = document.getElementById('modal-ex-note-popup');
+    if (!popup) return;
+    popup.classList.toggle('hidden');
+  });
+  document.getElementById('modal-ex-note-close')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.getElementById('modal-ex-note-popup')?.classList.add('hidden');
+  });
+  document.getElementById('timer-modal')?.addEventListener('click', (e) => {
+    const popup = document.getElementById('modal-ex-note-popup');
+    const btn   = document.getElementById('modal-ex-info-btn');
+    if (popup && !popup.classList.contains('hidden') &&
+        !popup.contains(e.target) && e.target !== btn) {
+      popup.classList.add('hidden');
+    }
+  });
 
   // Weight +/-
   document.getElementById('modal-weight-plus')?.addEventListener('click', () => {
