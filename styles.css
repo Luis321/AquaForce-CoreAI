@@ -486,8 +486,43 @@ h1 {
 }
 .modal-inner { max-width: 420px; }
 
+.modal-ex-name-row {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
 .modal-ex-name {
   font-family: var(--font-d); font-size: 30px; font-weight: 800; color: var(--text); line-height: 1;
+}
+.modal-ex-info-btn {
+  flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
+  background: transparent; border: 1.5px solid var(--aqua); color: var(--aqua);
+  font-size: 11px; font-weight: 900; font-style: italic; font-family: Georgia, serif;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  opacity: .65; transition: opacity .15s, transform .15s;
+}
+.modal-ex-info-btn:active { opacity: 1; transform: scale(.88); }
+.modal-ex-info-btn.pm { border-color: var(--orange); color: var(--orange); }
+.modal-ex-note-popup {
+  position: relative; margin: 8px auto 0; max-width: 310px;
+  background: rgba(11,255,240,.06); border: 1px solid rgba(11,255,240,.22);
+  border-radius: 10px; padding: 10px 30px 10px 12px; text-align: left;
+  animation: noteIn .18s ease;
+}
+.modal-ex-note-popup.pm {
+  background: rgba(255,107,43,.06); border-color: rgba(255,107,43,.22);
+}
+.modal-ex-note-popup.hidden { display: none; }
+@keyframes noteIn { from { opacity:0; transform:translateY(-4px) } to { opacity:1; transform:translateY(0) } }
+.modal-ex-note-close {
+  position: absolute; top: 7px; right: 7px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: transparent; border: none;
+  color: var(--text3); font-size: 10px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0; line-height: 1;
+}
+.modal-ex-note-text {
+  font-family: var(--font-body); font-size: 12px; color: var(--text2);
+  line-height: 1.5; font-style: italic;
 }
 .modal-ex-target {
   font-family: var(--font-ui); font-size: 11px; font-weight: 600;
