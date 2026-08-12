@@ -7,22 +7,24 @@
 // ════════════════════════════════════════════════════════════════
 // 1. DAILY SCHEDULE — AM + PM por día
 // ════════════════════════════════════════════════════════════════
+// Módulo 1: 03/08/2026 – 20/09/2026 · Horario: oficina 7am–7pm + universidad lun/mié/sáb
 const DAILY_SCHEDULE = {
   0: { // Domingo
     label: 'Domingo',
     am: {
       name: 'Aguas Abiertas',
       type: 'swim', location: 'OW',
-      focus: 'Técnica · Patada · Orientación · Control',
-      tags: ['natacion','recovery'], duration: '45–90 min', load: 'moderada',
-      coach: 'Hoy el agua te enseña más que cualquier rutina en tierra. Foco en técnica, no en velocidad.',
+      focus: 'Técnica · Sighting · Bloques de ritmo · Base aeróbica',
+      tags: ['natacion','recovery'], duration: '45–90 min', load: 'media',
+      coach: 'La seguridad y las condiciones del agua tienen prioridad sobre completar la sesión. Foco en técnica y orientación, no en velocidad.',
       isSunday: true,
       exercises: [
-        {id:'warmup-sw',   name:'Entrada al agua / Calentamiento', sets:1, reps:null, duration:'5 min',   rest:60,  note:'Aclimatarse a la temperatura. Movimientos suaves.'},
-        {id:'kick-drill',  name:'Drill de patada',                  sets:3, reps:null, duration:'50 m',    rest:90,  note:'Solo piernas, tabla si tienes. Foco en la cadera, no solo pies.'},
-        {id:'orientation', name:'Orientación en agua abierta',      sets:2, reps:null, duration:'100 m',   rest:120, note:'Levanta la cabeza cada 6–8 brazadas. Elige un punto de referencia.'},
-        {id:'open-swim',   name:'Nado continuo libre',              sets:1, reps:null, duration:'20–40 min',rest:0,  note:'Ritmo cómodo. Escucha tu cuerpo.'},
-        {id:'cooldown-sw', name:'Vuelta a la calma',                sets:1, reps:null, duration:'5 min',   rest:0,  note:'Nado suave, respiración lenta. Estira en tierra.'}
+        {id:'warmup-sw',    name:'Calentamiento',                   sets:1, reps:null, duration:'5–10 min', rest:60,  note:'Adaptación al agua. RPE 3.'},
+        {id:'tech-sw',      name:'Técnica',                         sets:1, reps:null, duration:'10 min',   rest:60,  note:'Brazada y posición corporal. RPE 4.'},
+        {id:'sighting',     name:'Sighting',                        sets:8, reps:null, duration:'reps',     rest:30,  note:'Orientación — clave para aguas abiertas. RPE 4–5.'},
+        {id:'open-swim',    name:'Nado continuo',                   sets:1, reps:null, duration:'20–40 min',rest:0,   note:'Base aeróbica. RPE 5–6.'},
+        {id:'pace-blocks',  name:'Bloques de ritmo',                sets:5, reps:null, duration:'2 min',    rest:120, note:'2 min suaves entre bloques. RPE 7.'},
+        {id:'cooldown-sw',  name:'Vuelta a la calma',                sets:1, reps:null, duration:'5–10 min', rest:0,   note:'Muy suave. RPE 2–3.'}
       ]
     },
     pm: null
@@ -30,16 +32,21 @@ const DAILY_SCHEDULE = {
   1: { // Lunes
     label: 'Lunes',
     am: {
-      name: 'Activación Matutina',
+      name: 'Activación + Core + Serrato',
       type: 'home', location: 'Casa',
-      focus: 'Movilidad + activación ligera · Sin carga, solo despertar el cuerpo',
-      tags: ['recovery','core','natacion'], duration: '40 min', load: 'suave',
-      coach: 'Rutina de activación — sin carga, solo para despertar el cuerpo antes del trabajo. Hoy no se trata de esfuerzo, se trata de consistencia.',
+      focus: 'Movilidad · Core · Serrato · Kegel — carga baja',
+      tags: ['recovery','core','natacion'], duration: '30–35 min', load: 'baja',
+      coach: 'Rutina de baja carga por universidad hoy. No hay entrenamiento adicional por la noche — hoy se trata de consistencia, no de esfuerzo.',
       exercises: [
-        {id:'gato-vaca',    name:'Gato-Vaca',                       sets:2, reps:10,  duration:null,  rest:30, note:'Activa la columna. Inhala al bajar, exhala al subir.'},
-        {id:'kegel',        name:'Kegel',                           sets:1, reps:12,  duration:null,  rest:20, note:'Core profundo para empezar el día.'},
-        {id:'flow-am',      name:'Flow: side kick + crawl + hip twist + push-up', sets:2, reps:5, duration:null, rest:45, note:'Activación completa. Fluido, sin pausas entre los 4 movimientos.'},
-        {id:'flutter',      name:'Flutter kicks',                   sets:3, reps:null, duration:'40s', rest:45, note:'Simula la patada de crol. Espalda baja pegada al suelo.'}
+        {id:'gato-vaca',    name:'Gato-Vaca',                       sets:2, reps:8,   duration:null, rest:20, note:'Movilidad de columna. Muy suave.'},
+        {id:'halo',         name:'Halo con mancuerna',              sets:2, reps:6,   duration:null, rest:30, note:'6 por lado. Movimiento controlado. RPE 4.'},
+        {id:'serrato-b',    name:'Serrato colgado / Scapular Pull-Up', sets:3, reps:9, duration:null, rest:45, note:'8–10 reps. No flexionar los codos. RPE 6.'},
+        {id:'pushup-plus',  name:'Push-Up Plus',                    sets:2, reps:11,  duration:null, rest:40, note:'10–12 reps. Protracción escapular completa al final. RPE 6.'},
+        {id:'dead-bug',     name:'Dead Bug',                        sets:3, reps:8,   duration:null, rest:30, note:'8 por lado. Mantener lumbar estable. RPE 6.'},
+        {id:'rev-crunch',   name:'Reverse Crunch',                  sets:2, reps:11,  duration:null, rest:30, note:'10–12 reps. Sin impulso. RPE 6.'},
+        {id:'flutter',      name:'Flutter Kicks',                   sets:2, reps:null,duration:'30s', rest:30, note:'Core activo. RPE 6.'},
+        {id:'kegel-lento',  name:'Kegel lento',                     sets:2, reps:7,   duration:null, rest:20, note:'6–8 reps. 5s contracción + 5s relajación, 50–60%.'},
+        {id:'kegel-rapido', name:'Kegel rápido',                    sets:1, reps:9,   duration:null, rest:20, note:'8–10 reps. 1s contracción / 1s relajación, 50–60%.'}
       ]
     },
     pm: null
@@ -47,52 +54,54 @@ const DAILY_SCHEDULE = {
   2: { // Martes
     label: 'Martes',
     am: {
-      name: 'Pierna Hipertrofia',
+      name: 'Pierna A — Fuerza + Cuádriceps',
       type: 'home', location: 'Casa',
-      focus: 'Fuerza de piernas para patada + volumen muscular',
-      tags: ['pierna','core','natacion'], duration: '70 min', load: 'alta',
-      coach: 'El día más importante de la semana. Cada rep de sentadilla se convierte en potencia en el agua — esta noche lo compruebas en la piscina.',
+      focus: 'Fuerza de piernas · Cuádriceps · Principal de la semana',
+      tags: ['pierna','core','natacion'], duration: '55 min', load: 'alta',
+      coach: 'Día de carga alta. Sentadilla es el ejercicio principal — mantén RPE 8, sin llegar al fallo.',
       exercises: [
-        {id:'gato-vaca',    name:'Gato-Vaca',                       sets:2, reps:10,  duration:null,  rest:30,  note:'Activa la columna. Inhala al bajar, exhala al subir.'},
-        {id:'kegel',        name:'Kegel',                           sets:1, reps:12,  duration:null,  rest:20,  note:'Core profundo antes de las cargas pesadas.'},
-        {id:'flow-am',      name:'Flow: side kick + crawl + hip twist + push-up', sets:2, reps:5, duration:null, rest:45, note:'Activación completa. Fluido, sin pausas entre los 4 movimientos.'},
-        {id:'sentadilla',   name:'Sentadilla con barra',            sets:4, reps:8,   duration:null,  rest:90,  note:'Tempo 3-1-1. Baja en 3 seg, pausa 1 seg, sube 1 seg explotando. Barra a 15 kg. Rodillas siguen la línea de los pies.', tempo:'3-1-1', isMain:true},
-        {id:'zancada-b',    name:'Zancada trasera con barra',       sets:4, reps:10,  duration:null,  rest:75,  note:'10 reps por pierna. Rodilla trasera toca suelo. Torso erecto.', isMain:true},
-        {id:'step-up',      name:'Step-up con mancuernas',          sets:3, reps:12,  duration:null,  rest:60,  note:'12 reps por pierna. Empuja desde el pie de arriba. Sin impulso abajo.', isMain:true},
-        {id:'sq-sumo',      name:'Sentadilla sumo con mancuerna',   sets:3, reps:15,  duration:null,  rest:60,  note:'Pies más abiertos. Activa aductores y glúteo.'},
-        {id:'rdl',          name:'Peso muerto rumano con barra',    sets:3, reps:10,  duration:null,  rest:75,  note:'Cadera atrás, espalda recta. Sientes el estiramiento en isquiotibiales.'},
-        {id:'hip-bridge',   name:'Puente de glúteo con barra',      sets:3, reps:12,  duration:null,  rest:60,  note:'Apoya la barra sobre las caderas con toalla. Contrae glúteo arriba.'},
-        {id:'flutter',      name:'Flutter kicks',                   sets:3, reps:null, duration:'40s', rest:45, note:'Simula la patada de crol. Espalda baja pegada al suelo.'}
+        {id:'mov-dinamica', name:'Movilidad dinámica',              sets:1, reps:null, duration:'5 min', rest:0,  note:'Cadera y tobillos. RPE suave.'},
+        {id:'sentadilla',   name:'Sentadilla con barra',            sets:4, reps:7,   duration:null, rest:90, note:'6–8 reps. Ejercicio principal. RPE 8.', isMain:true},
+        {id:'zancada-b',    name:'Zancada trasera',                 sets:3, reps:8,   duration:null, rest:75, note:'8 por lado. Control excéntrico. RPE 8.', isMain:true},
+        {id:'step-up',      name:'Step-Up',                         sets:3, reps:8,   duration:null, rest:60, note:'8 por lado. Evitar impulso. RPE 7–8.', isMain:true},
+        {id:'rdl',          name:'Peso muerto rumano',              sets:3, reps:9,   duration:null, rest:75, note:'8–10 reps. Isquios/glúteos. RPE 8.'},
+        {id:'pantorrilla',  name:'Pantorrilla de pie',               sets:3, reps:13,  duration:null, rest:45, note:'12–15 reps. Pausa arriba. RPE 8.'},
+        {id:'plancha',      name:'Plancha',                         sets:2, reps:null, duration:'40–45s', rest:45, note:'No llegar al fallo. RPE 6.'}
       ]
     },
     pm: {
-      name: 'Piscina — Técnica y Resistencia',
+      name: 'Piscina',
       type: 'swim', location: 'Piscina',
-      focus: 'Técnica de nado · Resistencia aeróbica · Series',
-      tags: ['natacion'], duration: '90 min', load: 'moderada',
-      coach: 'Piernas cargadas desde la mañana. Ahora conviértelas en propulsión: técnica antes que velocidad.',
+      focus: 'Aeróbico · Técnica · Patada',
+      tags: ['natacion'], duration: '60 min', load: 'alta',
+      coach: 'Piernas cargadas desde la mañana. Ahora conviértelas en propulsión: técnica antes que velocidad. 20:00–21:00.',
       exercises: [
-        {id:'pool-warmup',  name:'Entrada y calentamiento',         sets:1, reps:null, duration:'10 min', rest:60, note:'Nado suave mixto. Aclimata el cuerpo después de la pierna de la mañana.'},
-        {id:'pool-drill',   name:'Drills de técnica',               sets:4, reps:null, duration:'50 m',   rest:30, note:'Catch-up, dedos al costado, respiración bilateral. Calidad sobre velocidad.'},
-        {id:'pool-main',    name:'Serie principal aeróbica',        sets:6, reps:null, duration:'100 m',  rest:45, note:'Ritmo constante. Las piernas se sienten pesadas — controla la patada.'},
-        {id:'pool-kick',    name:'Patada final',                    sets:4, reps:null, duration:'25 m',   rest:60, note:'Solo piernas con tabla. Convierte la fuerza de la mañana en propulsión.'},
-        {id:'pool-cooldown',name:'Vuelta a la calma',                sets:1, reps:null, duration:'5 min',  rest:0,  note:'Nado suave, respiración lenta. Estira en el borde.'}
+        {id:'pool-warmup',  name:'Nado suave',                      sets:1, reps:null, duration:'400 m', rest:60, note:'Calentamiento. RPE 3–4.'},
+        {id:'pool-drill',   name:'Drills técnicos',                 sets:6, reps:null, duration:'50 m',  rest:30, note:'Priorizar técnica. RPE 4–5.'},
+        {id:'pool-main',    name:'Serie principal',                 sets:6, reps:null, duration:'100 m', rest:45, note:'Aeróbico. RPE 6–7.'},
+        {id:'pool-kick',    name:'Patada',                          sets:4, reps:null, duration:'50 m',  rest:60, note:'No destruir piernas. RPE 6.'},
+        {id:'pool-continuo',name:'Nado continuo',                   sets:1, reps:null, duration:'10 min',rest:0,  note:'Ritmo estable. RPE 5–6.'},
+        {id:'pool-cooldown',name:'Vuelta a la calma',                sets:1, reps:null, duration:'200 m', rest:0,  note:'Muy suave. RPE 2–3.'}
       ]
     }
   },
   3: { // Miércoles
     label: 'Miércoles',
     am: {
-      name: 'Activación Matutina',
+      name: 'Recuperación + Core',
       type: 'home', location: 'Casa',
-      focus: 'Movilidad + activación ligera · Sin carga, solo despertar el cuerpo',
-      tags: ['recovery','core','natacion'], duration: '40 min', load: 'suave',
-      coach: 'Segunda sesión de activación de la semana. Después de la pierna del martes, hoy el cuerpo solo necesita movimiento suave.',
+      focus: 'Recuperación activa · Core suave · Movilidad de hombro',
+      tags: ['recovery','core','natacion'], duration: '30 min', load: 'baja',
+      coach: 'No añadir trabajo intenso de piernas ni abdominales — hoy es recuperación tras la pierna del martes. Todo suave.',
       exercises: [
-        {id:'gato-vaca',    name:'Gato-Vaca',                       sets:2, reps:10,  duration:null,  rest:30, note:'Activa la columna. Inhala al bajar, exhala al subir.'},
-        {id:'kegel',        name:'Kegel',                           sets:1, reps:12,  duration:null,  rest:20, note:'Core profundo para empezar el día.'},
-        {id:'flow-am',      name:'Flow: side kick + crawl + hip twist + push-up', sets:2, reps:5, duration:null, rest:45, note:'Activación completa. Fluido, sin pausas entre los 4 movimientos.'},
-        {id:'flutter',      name:'Flutter kicks',                   sets:3, reps:null, duration:'40s', rest:45, note:'Simula la patada de crol. Espalda baja pegada al suelo.'}
+        {id:'gato-vaca',    name:'Gato-Vaca',                       sets:2, reps:8,   duration:null, rest:20, note:'Movilidad. RPE 2.'},
+        {id:'rot-toracica', name:'Rotación torácica',               sets:2, reps:6,   duration:null, rest:20, note:'6 por lado. Suave. RPE 2.'},
+        {id:'halo',         name:'Halo con mancuerna',              sets:2, reps:6,   duration:null, rest:30, note:'6 por lado. Movilidad de hombro. RPE 3–4.'},
+        {id:'serrato-s',    name:'Serrato suave en barra',          sets:2, reps:7,   duration:null, rest:30, note:'6–8 reps. Descarga. RPE 4–5.'},
+        {id:'bird-dog',     name:'Bird Dog',                        sets:2, reps:8,   duration:null, rest:30, note:'8 por lado. Control. RPE 4.'},
+        {id:'side-plank',   name:'Side Plank',                      sets:2, reps:null,duration:'25–30s', rest:30, note:'Por lado. Oblicuos. RPE 5–6.'},
+        {id:'resp-diaf',    name:'Respiración diafragmática',       sets:1, reps:null,duration:'3–5 min', rest:0,  note:'Recuperación. Muy suave.'},
+        {id:'kegel-lento-m',name:'Kegel lento',                     sets:2, reps:6,   duration:null, rest:20, note:'Sin máxima contracción, 50%.'}
       ]
     },
     pm: null
@@ -100,80 +109,75 @@ const DAILY_SCHEDULE = {
   4: { // Jueves
     label: 'Jueves',
     am: {
-      name: 'Pierna Hipertrofia',
+      name: 'Pierna B — Cadena posterior + Glúteos',
       type: 'home', location: 'Casa',
-      focus: 'Segunda sesión de pierna · Progresión de carga semanal',
-      tags: ['pierna','core','natacion'], duration: '70 min', load: 'alta',
-      coach: 'Segunda pierna de la semana. Si el martes fue bueno, hoy sube 2.5 kg en sentadilla.',
+      focus: 'Cadena posterior · Glúteos · Menor carga de sentadilla que martes',
+      tags: ['pierna','core','natacion'], duration: '55 min', load: 'alta',
+      coach: 'Hoy el peso muerto rumano es el principal, no la sentadilla. Mantén RPE 8 en los ejercicios clave.',
       exercises: [
-        {id:'gato-vaca',    name:'Gato-Vaca',                       sets:2, reps:10,  duration:null,  rest:30,  note:'Activa la columna antes del trabajo fuerte.'},
-        {id:'kegel',        name:'Kegel',                           sets:1, reps:12,  duration:null,  rest:20,  note:'Core profundo antes de las cargas.'},
-        {id:'flow-am',      name:'Flow: side kick + crawl + hip twist + push-up', sets:2, reps:5, duration:null, rest:45, note:'Activación completa. Fluido, sin pausas entre los 4 movimientos.'},
-        {id:'sentadilla',   name:'Sentadilla con barra',            sets:4, reps:8,   duration:null,  rest:90,  note:'Mismo peso que el martes o +2.5 kg si completaste todas las reps. Tempo 3-1-1.', tempo:'3-1-1', isMain:true},
-        {id:'zancada-b',    name:'Zancada trasera con barra',       sets:4, reps:10,  duration:null,  rest:75,  note:'10 reps por pierna. Controla la bajada.', isMain:true},
-        {id:'step-up',      name:'Step-up con mancuernas',          sets:3, reps:12,  duration:null,  rest:60,  note:'12 reps por pierna. Progresa en peso si puedes.', isMain:true},
-        {id:'sq-sumo',      name:'Sentadilla sumo',                 sets:3, reps:15,  duration:null,  rest:60,  note:'Aductores y glúteo. Peso moderado, recorrido completo.'},
-        {id:'rdl',          name:'Peso muerto rumano',              sets:3, reps:10,  duration:null,  rest:75,  note:'Isquiotibiales y cadena posterior. Espalda neutra.'},
-        {id:'hip-bridge',   name:'Puente de glúteo',                sets:3, reps:12,  duration:null,  rest:60,  note:'Contrae glúteo y mantén 1 seg arriba.'},
-        {id:'flutter',      name:'Flutter kicks',                   sets:3, reps:null, duration:'40s', rest:45, note:'Termina siempre con el patrón de patada.'}
+        {id:'mov-dinamica2',name:'Movilidad dinámica',              sets:1, reps:null, duration:'5 min', rest:0,  note:'Preparación. Suave.'},
+        {id:'rdl-b',        name:'Peso muerto rumano',              sets:4, reps:7,   duration:null, rest:90, note:'6–8 reps. Principal del día. RPE 8.', isMain:true},
+        {id:'sentadilla-b', name:'Sentadilla con barra',            sets:3, reps:9,   duration:null, rest:75, note:'8–10 reps. Menor carga que martes. RPE 7–8.', isMain:true},
+        {id:'sq-sumo',      name:'Sentadilla sumo',                 sets:3, reps:10,  duration:null, rest:60, note:'Aductores/glúteos. RPE 8.'},
+        {id:'hip-bridge',   name:'Puente de glúteos',               sets:3, reps:11,  duration:null, rest:60, note:'10–12 reps. Pausa 2s arriba. RPE 8.'},
+        {id:'pantorrilla-b',name:'Pantorrilla',                     sets:3, reps:13,  duration:null, rest:45, note:'12–15 reps. ROM completo. RPE 8.'},
+        {id:'hang-knee',    name:'Hanging Knee Raise',               sets:2, reps:9,   duration:null, rest:45, note:'8–10 reps. Evitar balanceo. RPE 7.'}
       ]
     },
     pm: {
-      name: 'Piscina — Técnica y Resistencia',
+      name: 'Piscina',
       type: 'swim', location: 'Piscina',
-      focus: 'Técnica de nado · Resistencia aeróbica · Series',
-      tags: ['natacion'], duration: '90 min', load: 'moderada',
-      coach: 'Última sesión fuerte de la semana. Nada con las piernas cansadas — así se construye resistencia real.',
+      focus: 'Técnica de brazada · Sighting · Transferencia a aguas abiertas',
+      tags: ['natacion'], duration: '60 min', load: 'alta',
+      coach: 'Última sesión fuerte de la semana. Nada con las piernas cansadas — así se construye resistencia real. 20:00–21:00.',
       exercises: [
-        {id:'pool-warmup',  name:'Entrada y calentamiento',         sets:1, reps:null, duration:'10 min', rest:60, note:'Nado suave mixto. Aclimata el cuerpo después de la pierna de la mañana.'},
-        {id:'pool-drill',   name:'Drills de técnica',               sets:4, reps:null, duration:'50 m',   rest:30, note:'Catch-up, dedos al costado, respiración bilateral. Calidad sobre velocidad.'},
-        {id:'pool-main',    name:'Serie principal aeróbica',        sets:6, reps:null, duration:'100 m',  rest:45, note:'Ritmo constante. Las piernas se sienten pesadas — controla la patada.'},
-        {id:'pool-kick',    name:'Patada final',                    sets:4, reps:null, duration:'25 m',   rest:60, note:'Solo piernas con tabla. Convierte la fuerza de la mañana en propulsión.'},
-        {id:'pool-cooldown',name:'Vuelta a la calma',                sets:1, reps:null, duration:'5 min',  rest:0,  note:'Nado suave, respiración lenta. Estira en el borde.'}
+        {id:'pool-warmup2', name:'Calentamiento',                   sets:1, reps:null, duration:'400 m', rest:60, note:'Fácil. RPE 3–4.'},
+        {id:'pool-tech2',   name:'Técnica',                         sets:6, reps:null, duration:'50 m',  rest:30, note:'Calidad. RPE 5.'},
+        {id:'pool-main2',   name:'Serie principal',                 sets:8, reps:null, duration:'100 m', rest:45, note:'Ritmo sostenible. RPE 6–7.'},
+        {id:'pool-pull',    name:'Pull / técnica de brazada',       sets:4, reps:null, duration:'50 m',  rest:45, note:'Enfoque en torso. RPE 6.'},
+        {id:'pool-sighting',name:'Orientación / Sighting',          sets:4, reps:null, duration:'50 m',  rest:45, note:'Transferencia a aguas abiertas. RPE 5.'},
+        {id:'pool-cooldown2',name:'Vuelta a la calma',               sets:1, reps:null, duration:'200 m', rest:0,  note:'Recuperación. RPE 2–3.'}
       ]
     }
   },
   5: { // Viernes
     label: 'Viernes',
     am: {
-      name: 'Torso · Empuje',
-      type: 'gym', location: 'Gym',
-      focus: 'Pecho · Hombros · Tríceps · Físico de playa (después de las 6pm)',
-      tags: ['gym','estabilidad'], duration: '70 min', load: 'alta',
-      coach: 'Nueva rutina de torso y empuje, después de las 6pm. Si la semana fue muy exigente, cambia esta sesión por natación suave — escucha al cuerpo.',
+      name: 'Torso Completo',
+      type: 'home', location: 'Casa',
+      focus: 'Espalda · Pecho · Hombros · Físico de playa',
+      tags: ['gym','estabilidad'], duration: '55–60 min', load: 'media-alta',
+      coach: 'Si falta tiempo por la mañana, corta primero Curl de bíceps y Extensión de tríceps. NO recortes Dominadas, Press, Remo ni Elevaciones laterales.',
       exercises: [
-        {id:'hombro-circ',   name:'Círculos de hombro + rotación externa', sets:2, reps:10,  duration:null,  rest:20, note:'10 reps por lado. Movilidad completa antes de cargar.'},
-        {id:'pushup-lento',  name:'Push-up lento sin peso',           sets:1, reps:8,   duration:null,  rest:30, note:'Bajada de 3-4 seg. Activa pecho y tríceps antes del press.'},
-        {id:'press-banca-db',name:'Press banca con mancuernas (banco plano, sin rack)', sets:4, reps:8, duration:null, rest:90, note:'Tempo 3-1-1: baja 3 seg, pausa 1 seg, sube 1 seg explotando.', tempo:'3-1-1', isMain:true},
-        {id:'press-mil-b',   name:'Press militar de pie con barra (clean desde el suelo)', sets:3, reps:10, duration:null, rest:75, note:'Clean la barra desde el suelo a los hombros, luego prensa. Core apretado.'},
-        {id:'aperturas-db',  name:'Aperturas con mancuerna (banco plano)', sets:3, reps:12, duration:null, rest:75, note:'Codos con leve flexión fija. Baja hasta sentir estiramiento en el pecho.'},
-        {id:'elev-lat-db',   name:'Elevaciones laterales con mancuerna', sets:3, reps:15,  duration:null,  rest:45, note:'Pesos moderados. Codos levemente flexionados. Sin impulso.'},
-        {id:'fondos-banco',  name:'Fondos en banco',                 sets:3, reps:12,  duration:null,  rest:60, note:'Manos en el borde del banco. Baja hasta 90° en el codo.'},
-        {id:'ext-triceps-db',name:'Extensión de tríceps con mancuerna', sets:3, reps:12, duration:null, rest:45, note:'Codos fijos junto a la cabeza. Baja controlado detrás de la nuca.'},
-        {id:'face-pull-db',  name:'Face pull con mancuerna de pie (bisagra de cadera)', sets:3, reps:15, duration:null, rest:45, note:'Bisagra de cadera, jala hacia la cara separando las manos. Protege el hombro.'},
-        {id:'kb-swing',      name:'Kettlebell swing',                sets:3, reps:15,  duration:null,  rest:60, note:'Empuje de cadera, no sentadilla. Core apretado, brazos relajados.'}
+        {id:'halo-v',        name:'Halo con mancuerna',             sets:2, reps:6,   duration:null, rest:20, note:'6 por lado. Calentamiento. RPE 3.'},
+        {id:'dominadas',     name:'Dominadas',                      sets:3, reps:7,   duration:null, rest:90, note:'5–8 reps. Straps solo si el agarre limita. RPE 8.', isMain:true},
+        {id:'press-banca-db',name:'Press banca con mancuernas',     sets:3, reps:8,   duration:null, rest:90, note:'6–10 reps. Pecho. RPE 8.', isMain:true},
+        {id:'remo-db',       name:'Remo',                           sets:3, reps:9,   duration:null, rest:75, note:'8–10 reps. Espalda. RPE 8.', isMain:true},
+        {id:'press-mil-b',   name:'Press militar',                  sets:3, reps:8,   duration:null, rest:75, note:'6–10 reps. No llegar al fallo. RPE 7–8.'},
+        {id:'elev-lat-db',   name:'Elevaciones laterales',          sets:3, reps:13,  duration:null, rest:45, note:'12–15 reps. Deltoide lateral. RPE 8.'},
+        {id:'face-pull-db',  name:'Face pull con mancuerna',        sets:3, reps:13,  duration:null, rest:45, note:'12–15 reps. Equivalente casero a polea. RPE 7.'},
+        {id:'shrug-db',      name:'Shrug / Encogimientos',          sets:3, reps:11,  duration:null, rest:45, note:'10–12 reps. Trapecio. RPE 8.'},
+        {id:'curl-biceps',   name:'Curl de bíceps',                 sets:2, reps:11,  duration:null, rest:40, note:'10–12 reps. Accesorio — primero a recortar si falta tiempo. RPE 8.'},
+        {id:'ext-triceps-db',name:'Extensión de tríceps',           sets:2, reps:11,  duration:null, rest:40, note:'10–12 reps. Accesorio — segundo a recortar si falta tiempo. RPE 8.'}
       ]
     },
-    pm: null, pmNote: '✅ Sesión única después de las 6pm · Alternativa: natación suave'
+    pm: null, pmNote: '🏋️ Sesión matutina en casa · Prioridad si falta tiempo: recorta Curl y Extensión de tríceps primero'
   },
   6: { // Sábado
     label: 'Sábado',
     am: {
-      name: 'Activación Suave (opcional)',
+      name: 'Descanso',
       type: 'home', location: 'Casa',
-      focus: 'Movilidad + activación ligera · Descanso o movilidad opcional',
-      tags: ['recovery','estabilidad'], duration: '15–20 min', load: 'suave',
-      coach: 'Sábado es descanso. Si tienes energía, aprovecha el hueco de clases de 15 a 18h para 15-20 min de movilidad suave — nunca es obligatorio.',
+      focus: 'Recuperación · Nada de fuerza, hipertrofia, HIIT ni natación intensa',
+      tags: ['recovery'], duration: '15–30 min', load: 'recuperación',
+      coach: 'Día oficial de recuperación por carga universitaria. Todo lo de hoy es opcional — escucha al cuerpo.',
       exercises: [
-        {id:'gato-vaca',    name:'Gato-Vaca',                       sets:3, reps:10,  duration:null,   rest:20, note:'El más importante del día. Abre la columna.'},
-        {id:'kegel',        name:'Kegel',                           sets:2, reps:12,  duration:null,   rest:20, note:'Core profundo, incluso en días suaves.'},
-        {id:'flow-suave',   name:'Flow suave',                      sets:2, reps:4,   duration:null,   rest:30, note:'Sin explosividad. Movimiento fluido y consciente.'},
-        {id:'plank-light',  name:'Plancha ligera',                  sets:2, reps:null, duration:'20s', rest:30, note:'Activa sin fatigar.'},
-        {id:'serrato-s',    name:'Serrato suave',                   sets:2, reps:6,   duration:null,   rest:30, note:'Recuerda la protracción para mañana en el agua.'},
-        {id:'flutter-s',    name:'Flutter kicks suave',             sets:2, reps:null, duration:'15s', rest:30, note:'Solo para recordar el patrón antes de nadar mañana.'}
+        {id:'caminata',     name:'Caminata',                        sets:1, reps:null, duration:'15–30 min', rest:0, note:'Opcional. RPE 2.'},
+        {id:'movilidad-sab',name:'Movilidad',                       sets:1, reps:null, duration:'5–10 min',  rest:0, note:'Opcional. RPE 2.'},
+        {id:'resp-sab',     name:'Respiración',                     sets:1, reps:null, duration:'3–5 min',   rest:0, note:'Muy suave. Recuperación.'}
       ]
     },
-    pm: null, pmNote: '📚 Clases · Movilidad opcional en el hueco 15–18h'
+    pm: null, pmNote: '📚 Universidad · Día de descanso oficial'
   }
 };
 
@@ -1392,7 +1396,11 @@ function updateTimerModal() {
   const btnStart  = document.getElementById('modal-btn-start');
   const btnCompl  = document.getElementById('modal-btn-complete-set');
   const btnRest   = document.getElementById('modal-btn-rest');
+  const btnNextEx = document.getElementById('modal-btn-next-ex');
   const isPM      = type === 'pm';
+  const isFinalRest = APP.currentSeriesCount >= ex.sets &&
+                       ['rest_running','rest_done'].includes(APP.timerState);
+  if (btnNextEx) btnNextEx.disabled = isFinalRest;
 
   btnStart.className = `btn btn-primary${isPM ? ' pm-btn' : ''}`;
   btnCompl.className = `btn btn-orange`;
@@ -1482,29 +1490,40 @@ function completeSet() {
   document.getElementById('series-fill').style.strokeDashoffset =
     CIRC - CIRC * (APP.currentSeriesCount / APP.currentExercise.sets);
 
-  if (APP.currentSeriesCount >= APP.currentExercise.sets) {
-    APP.timerState = 'done';
-    markExerciseDone(APP.currentExercise.id, APP.currentTimerSession);
-    showToast('🎯 ¡Ejercicio completado!', 'success');
-  } else {
-    const restSecs = APP.currentExercise.rest || 60;
-    REST_TOTAL_SECS = restSecs; APP.timerSeconds = restSecs;
-    APP.timerState  = 'rest_running';
-    document.getElementById('timer-display').textContent = formatTime(restSecs);
-    document.getElementById('timer-fill').classList.replace('aqua','orange');
-    showToast(`Serie ${APP.currentSeriesCount}/${APP.currentExercise.sets} ✓ · Descansando ${restSecs}s`);
-    _runRestTimer();
-  }
+  // Siempre hay descanso tras completar una serie — incluida la última.
+  // Sin esto, terminar la última serie saltaba directo al siguiente
+  // ejercicio con 0s de descanso.
+  const isLastSet = APP.currentSeriesCount >= APP.currentExercise.sets;
+  const restSecs  = APP.currentExercise.rest || 60;
+  REST_TOTAL_SECS = restSecs; APP.timerSeconds = restSecs;
+  APP.timerState  = 'rest_running';
+  document.getElementById('timer-display').textContent = formatTime(restSecs);
+  document.getElementById('timer-fill').classList.replace('aqua','orange');
+  showToast(
+    isLastSet
+      ? `Última serie ✓ · Descansando ${restSecs}s antes del siguiente ejercicio`
+      : `Serie ${APP.currentSeriesCount}/${APP.currentExercise.sets} ✓ · Descansando ${restSecs}s`
+  );
+  _runRestTimer();
   updateTimerModal();
 }
 
 function completeRest() {
   if (APP.timerState !== 'rest_done') return;
-  stopTimer(); APP.timerSeconds = 0; REST_TOTAL_SECS = 0; APP.timerState = 'idle';
+  stopTimer(); APP.timerSeconds = 0; REST_TOTAL_SECS = 0;
   const fill = document.getElementById('timer-fill');
   fill.style.strokeDashoffset = '0'; fill.classList.replace('orange','aqua');
   document.getElementById('timer-display').textContent = '00:00';
-  showToast('▶ ¡A por la siguiente serie!', 'success');
+
+  if (APP.currentSeriesCount >= APP.currentExercise.sets) {
+    // Era el descanso posterior a la última serie: ahora sí se marca completado.
+    APP.timerState = 'done';
+    markExerciseDone(APP.currentExercise.id, APP.currentTimerSession);
+    showToast('🎯 ¡Ejercicio completado!', 'success');
+  } else {
+    APP.timerState = 'idle';
+    showToast('▶ ¡A por la siguiente serie!', 'success');
+  }
   updateTimerModal();
 }
 
